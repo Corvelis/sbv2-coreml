@@ -1,0 +1,17 @@
+SBV2 Core ML converter, an unofficial Apple Core ML adaptation of
+Style-Bert-VITS2 by litagin and contributors:
+https://github.com/litagin02/Style-Bert-VITS2
+Pinned source: 66de777e06392c0f313600be03c43ef96658b244
+
+This converter is distributed under AGPL-3.0-only. Full terms are in LICENSE.
+Original notices for code adapted from the Local AI / StackChan Talk project,
+Transformers, and Core ML Tools are retained under licenses/.
+The combined work's license does not replace individual source notices.
+
+Changes include direct checkpoint-to-Core-ML conversion, equivalent SDP spline
+operations, BERT block export, precision validation, shared-weight multifunction
+packaging, AIVM acquisition, checksums, and provenance recording.
+
+Downloaded upstream source and model weights are not included in this wheel.
+Each model retains its original license. Redistribution requires permission
+under that license; conversion does not grant new rights to weights or artwork.

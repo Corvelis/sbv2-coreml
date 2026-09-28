@@ -1,0 +1,18 @@
+name: Check source
+on: [push, pull_request]
+jobs:
+  python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install ./converter
+      - run: python -m unittest discover -s converter/tests -v
+  swift:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - run: swift test
+      - run: xcodebuild -project Examples/Apple/SBV2Demo.xcodeproj -scheme SBV2Demo-iOS -configuration Release -destination generic/platform=iOS CODE_SIGNING_ALLOWED=NO build

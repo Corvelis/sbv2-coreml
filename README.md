@@ -1,0 +1,109 @@
+# SBV2 Core ML
+
+Native Japanese **Style-Bert-VITS2 JP-Extra** speech synthesis for **iOS 18+** and
+**macOS 15+ on Apple Silicon**. Includes a Swift Package, iPhone/Mac example apps,
+a WAV command-line tool, and a checkpoint-to-Core-ML converter.
+
+[日本語](docs/README.ja.md) · [Conversion](docs/conversion.md) · [Model format](docs/model-format.md)
+· [Licenses](THIRD_PARTY_NOTICES.md) · [Release procedure](docs/releasing.md)
+
+## Contents
+
+- **Swift runtime:** Core ML BERT, encoder/DP, SDP, Flow and waveform decoder.
+  Japanese text processing uses bundled Open JTalk source and a separately obtained dictionary.
+  No Flutter, Python or ONNX Runtime is needed in the application.
+- **Separate voices:** reuse one shared BERT/dictionary with multiple voice packages.
+- **Streaming:** sentence-first, pull-based PCM generation, cancellation, bounded playback in the example.
+- **Conversion:** input an AivisHub URL, one AIVM, or a Safetensors checkpoint with config/style vectors.
+  The public conversion path exports directly from PyTorch without an intermediate ONNX file.
+- **Distribution:** model checksums, provenance, license preservation and local HF upload staging.
+
+This is a pre-release source distribution. See [verification](docs/verification.md) for the
+tested models, device measurements and remaining release checks. The sample voice is JVNV F1 JP-Extra;
+it requires the shared BERT and dictionary. Hosting URLs are chosen when publishing.
+
+## Run on a Mac
+
+With Xcode installed, and the two model folders obtained or prepared:
+
+```sh
+swift run -c release sbv2-say \
+  /path/to/sbv2-coreml-common/bert \
+  /path/to/sbv2-coreml-jvnv-f1-jp \
+  /path/to/sbv2-coreml-common/dictionary \
+  output.wav "こんにちは。今日はいい天気ですね。"
+```
+
+The CLI optionally accepts `STYLE SPEAKER_ID` after the text. Models compile on first use.
+Allow extra time and disk space for the initial compilation. Retain the resulting caches for faster reopening.
+
+## iPhone / Mac apps
+
+Open `Examples/Apple/SBV2Demo.xcodeproj`:
+
+1. Choose `SBV2Demo-iOS` or `SBV2Demo-macOS`.
+2. For iPhone, select your signing team and a unique bundle identifier.
+3. Run the app; select the common folder as **BERT**, then select the voice folder as **Voice**.
+   The dictionary inside the common folder is detected automatically.
+4. Press **準備・ウォームアップ**, then **読み上げ**.
+
+Alternatively enter an HTTPS URL for a release's `download.json`. Each file is downloaded and
+verified before installation. Copying the two model folders into the iOS app's Documents folder
+also works. The app's speech synthesis works offline once resources are present.
+
+## Use in Swift
+
+Add this repository as a Swift Package, then import `SBV2CoreML`:
+
+```swift
+let speech = SpeechSynthesizer()
+let info = try await speech.load(ModelPaths(
+    bert: common.appendingPathComponent("bert"),
+    voice: voiceDirectory,
+    dictionary: common.appendingPathComponent("dictionary")))
+try await speech.warmUp()
+
+for try await chunk in speech.stream("こんにちは。お元気ですか？") {
+    // Mono Float32 PCM, chunk.sampleRate == 44100.
+    // Await playback capacity here before requesting the next chunk.
+    consumePCM(chunk.pcm)
+}
+speech.cancel()
+try await speech.unload()
+```
+
+`consumePCM` represents your application's audio sink; see `PCMPlayer` in the example.
+Read `VoiceInfo.styles`/`speakers` when choosing options: not every voice has a `Neutral` style.
+Cancellation takes effect between native inference calls; an in-flight Core ML call is allowed to finish.
+
+## Convert a voice
+
+```sh
+python3.11 -m venv .venv
+.venv/bin/python -m pip install './converter[convert]' -c converter/requirements-lock-macos-arm64.txt
+.venv/bin/sbv2-coreml doctor
+.venv/bin/sbv2-coreml convert --aivm voice.aivm --output models/my-voice
+```
+
+The pinned upstream source is acquired automatically. [More inputs and validation details](docs/conversion.md).
+Conversion requires macOS/Python 3.11; the runtime itself only requires the Apple SDK and models.
+
+## Scope and licenses
+
+The supported profile is Japanese JP-Extra, 44.1 kHz, hop 512, 1024-dimensional BERT,
+256-dimensional styles, and the documented decoder architecture. Arbitrary SBV2 forks and
+AIVMX-only downloads are not supported. Internal capacity limits can require additional text splits.
+
+Code is distributed under **AGPL-3.0**, with retained notices for third-party components.
+The converted JVNV voice and common DeBERTa carry **CC BY-SA 4.0**; the dictionary has separate BSD notices.
+Other voices retain their own terms. See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+This repository does not grant permission to use third-party character artwork or trademarks.
+
+## Development
+
+```sh
+swift test
+PYTHONPATH=converter .venv/bin/python -m unittest discover -s converter/tests -v
+```
+
+No remote repository, package registry or model upload is created by these commands.

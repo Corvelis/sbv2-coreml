@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools==80.9.0", "wheel==0.45.1"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sbv2-coreml"
+version = "0.1.0.dev1"
+description = "Convert Japanese Style-Bert-VITS2 JP-Extra voices for native Apple Core ML inference"
+requires-python = ">=3.11,<3.12"
+license = "AGPL-3.0-only"
+license-files = ["LICENSE", "NOTICE", "licenses/*"]
+dependencies = ["numpy==2.2.6", "safetensors==0.5.2"]
+
+[project.optional-dependencies]
+convert = ["coremltools==9.0", "torch==2.7.0",
+  "transformers==4.48.2", "huggingface-hub==0.36.2", "protobuf==5.29.5", "scipy==1.17.1",
+  "numba==0.62.1", "pydantic==2.10.6", "loguru==0.7.3", "pyyaml==6.0.2", "sentencepiece==0.2.0"]
+
+[project.scripts]
+sbv2-coreml = "sbv2_coreml.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["sbv2_coreml*"]
+
+[tool.setuptools.package-data]
+sbv2_coreml = ["upstream.lock.json"]

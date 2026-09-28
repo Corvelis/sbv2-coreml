@@ -1,0 +1,13 @@
+.DS_Store
+.build/
+.swiftpm/
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+artifacts/
+models/
+*.mlmodelc/
+*.xcuserstate
+xcuserdata/

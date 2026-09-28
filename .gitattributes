@@ -1,0 +1,4 @@
+# Preserve third-party source encodings/line endings and original license text.
+Sources/SBV2Native/OpenJTalk/** -text -whitespace
+LICENSES/** -whitespace
+converter/licenses/** -whitespace
