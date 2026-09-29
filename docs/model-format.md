@@ -1,5 +1,7 @@
 # Model format v1
 
+[日本語](model-format.ja.md) · [Documentation index](README.ja.md)
+
 The Swift runtime loads the native-compatible directory layouts below. Release files also
 include `model.json`, `provenance.json`, `LICENSE.md`, `checksums.json`, and `download.json`.
 

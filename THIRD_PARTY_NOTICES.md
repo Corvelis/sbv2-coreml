@@ -1,5 +1,7 @@
 # Licensing and provenance
 
+[日本語の案内](docs/licenses.ja.md)
+
 ## Code
 
 This source distribution and its modifications are provided under **AGPL-3.0** (`LICENSE`).

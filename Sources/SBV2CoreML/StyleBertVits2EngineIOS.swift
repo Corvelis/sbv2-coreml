@@ -94,7 +94,7 @@ final class StyleBertVits2EngineIOS {
             return false
         }
         guard let voice = StyleBertVits2CoreMLVoice(voiceModelPath: ttsModelPath) else {
-            lastError = "Core ML voice bundle is missing or invalid. Convert the voice with add_coreml_voice.py."
+            lastError = "Core ML voice bundle is missing or invalid. Use sbv2-coreml convert and select the complete output folder."
             return false
         }
         guard let handle = StyleBertVits2CoreMLBert.createSession(withBertPath: bertModelPath) else {

@@ -1,5 +1,7 @@
 # Verification — 2026-09-28/29
 
+[日本語](verification.ja.md) · [Documentation index](README.ja.md)
+
 This is a **pre-release**. The figures below belong to this sample voice and precision
 profile. They are not a guarantee for every voice, text, temperature, or concurrent LLM.
 

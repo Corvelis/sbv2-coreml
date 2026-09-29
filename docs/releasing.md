@@ -1,11 +1,14 @@
 # Preparing and publishing a release
 
+[日本語](releasing.ja.md) · [Documentation index](README.ja.md)
+
 The repository prepares files locally. It never creates a remote repository or uploads weights automatically.
 
 ## 1. Verify the code
 
 ```sh
 swift test
+python3 scripts/check_docs.py --swift
 PYTHONPATH=converter .venv/bin/python -m unittest discover -s converter/tests -v
 xcodebuild -project Examples/Apple/SBV2Demo.xcodeproj -scheme SBV2Demo-macOS \
   -configuration Release -destination 'platform=macOS,arch=arm64' CODE_SIGNING_ALLOWED=NO build

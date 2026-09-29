@@ -1,57 +1,46 @@
-# SBV2 Core ML 日本語ガイド
+# SBV2 Core ML ドキュメント
 
-Style-Bert-VITS2 JP-ExtraをiPhone/Macで実行するための、独立したライブラリ・変換ツール・サンプルです。
-対応はiOS 18以上、macOS 15以上のApple Silicon。アプリでの推論にFlutter・Python・ONNX Runtimeは不要です。
+Style-Bert-VITS2 JP-ExtraをiPhone／Apple Silicon Macで使うためのSDK、サンプル、変換ツールです。
+アプリ内の推論にPython・Flutter・ONNX Runtimeは不要です。
 
-## 使うだけの場合
+## 目的から読む
 
-必要な配布フォルダは2つです。
+| やりたいこと | 最初に読むページ |
+|---|---|
+| サンプルで音声を出す | [クイックスタート](getting-started.ja.md) |
+| 自分のXcodeプロジェクトへ組み込む | [SDK導入・実装ガイド](sdk-guide.ja.md) |
+| メソッド、引数、停止処理を調べる | [Swift APIリファレンス](api-reference.ja.md) |
+| AivisHubや自作モデルの声を使う | [変換ガイド・CLIリファレンス](conversion.ja.md) |
+| モデルの構造、保存場所、サイズを調べる | [モデル仕様](model-format.ja.md) |
+| 初期化失敗、遅延、容量、音切れを調べる | [トラブルシューティング](troubleshooting.ja.md) |
+| 速度や精度の検証範囲を知る | [検証記録](verification.ja.md) |
+| コードやモデルを再配布する | [ライセンスと出典](licenses.ja.md)、[公開手順](releasing.ja.md) |
 
-- `sbv2-coreml-common`: 共通BERTと日本語辞書
-- `sbv2-coreml-jvnv-f1-jp`: サンプル音声1種類
+## 配布物
 
-`Examples/Apple/SBV2Demo.xcodeproj`を開き、iPhoneなら`SBV2Demo-iOS`、Macなら
-`SBV2Demo-macOS`を選んで実行します。iPhoneの署名チームとBundle IDは自分のものを指定してください。
+| 配布物 | 内容 | 入手・配置 |
+|---|---|---|
+| SDKとサンプル | Swift Package、iPhone／Macアプリ、WAV出力CLI、Python変換ツール | このリポジトリ／ソースZIP |
+| 共通モデル | 日本語BERTとOpen JTalk辞書、約1.52 GB | `sbv2-coreml-common` |
+| サンプルの声 | JVNV F1 JP-Extra、約294 MB | `sbv2-coreml-jvnv-f1-jp` |
 
-アプリの「モデル・辞書」で共通フォルダをBERTとして指定すると、BERTと辞書を読み分けます。
-音声フォルダをVoiceとして指定し、「準備・ウォームアップ」が終わったら読み上げられます。
-Files/Finderからフォルダを渡すか、公開後の`download.json`のHTTPS URLから取得できます。
+容量は展開後の配布ファイルの概算です。ダウンロード一時ファイルとCore MLのコンパイルキャッシュは別途必要です。
+互換性のある声パッケージを追加する際、共通BERT・辞書の再ダウンロードは不要です。
 
-初回はCore MLのコンパイルが必要です。ダウンロード容量に加えてコンパイル用の空き容量が必要になります。
-2回目以降はキャッシュを再利用します。読み込み・ウォームアップと音声合成の時間は別に測定します。
+## 対応範囲
 
-## 自分の声を変換する場合
+- iOS 18以上、macOS 15以上のApple Silicon。速度の確認には実機を使ってください。
+- 日本語JP-Extra、44.1 kHz、文書化した構造のモデル。通常版SBV2、多言語版、任意の派生構造は対象外です。
+- 変換はApple Silicon Mac、Python 3.11で行います。変換済みモデルを使うだけならPythonは不要です。
+- Xcode 27.0でビルド確認済み。すべての対応OS・Xcode版・機種を実測したわけではありません。
 
-```sh
-python3.11 -m venv .venv
-.venv/bin/python -m pip install './converter[convert]' -c converter/requirements-lock-macos-arm64.txt
+## 公開状況
 
-# AivisHubから。AIVMの公開が必要です。
-.venv/bin/sbv2-coreml convert --aivis-url https://hub.aivis-project.com/aivm-models/MODEL_UUID --output models/my-voice
+現在は公開準備版です。GitHub／Hugging Faceの公開URLは未確定で、架空のダウンロードリンクは掲載していません。
+[クイックスタート](getting-started.ja.md)は、入手したソースとモデルをローカルから使う手順です。
+公開後に埋める項目と確認手順は[公開手順](releasing.ja.md)に集約しています。
 
-# AIVMファイルから
-.venv/bin/sbv2-coreml convert --aivm voice.aivm --output models/my-voice
+コードはAGPL-3.0、JVNVと共通BERTはCC BY-SA 4.0です。辞書・他の声にはそれぞれの条件があります。
+本文の要約に加え、[ライセンス原文と第三者表記](../THIRD_PARTY_NOTICES.md)も確認してください。
 
-# 自分で学習したモデルから
-.venv/bin/sbv2-coreml convert --checkpoint model.safetensors --config config.json --styles style_vectors.npy --output models/my-voice
-```
-
-変換にはMac/Python 3.11を使います。SBV2のソースは固定版を自動取得します。
-共通BERTを毎回変換する必要はありません。変換後のフォルダをVoiceとして選択すれば声を交換できます。
-
-公開用アーカイブを作る場合は、元モデルのライセンスと出典も指定してください。
-個人での変換と、変換後のモデルを他の人へ再配布できるかは別に判断します。
-詳細は[変換手順](conversion.md)と[ライセンス](../THIRD_PARTY_NOTICES.md)を参照してください。
-
-## 音声の区切り
-
-句点・改行を優先し、最初の区間だけ読点も使います。句読点のない長文は250文字で強制分割します。
-音素数や予測音声長の上限を超えた場合は、さらに区切り直します。その場合は`capacitySplit`で通知します。
-サンプルは最初のPCMから再生を始め、再生残り約2秒で次の区間の合成を要求します。
-LLMを同時実行する際の一時停止・再開は呼び出し元のアプリで接続してください。
-
-## 現在の配布段階
-
-ローカルの公開準備版です。公開先URLはリリース時に確定します。
-動作確認と性能の範囲は[検証記録](verification.md)にまとめています。
-すべての声・文章・機種で同じRTFや波形の完全一致を保証するものではありません。
+[English overview](../README.md)

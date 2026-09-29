@@ -4,8 +4,24 @@ Native Japanese **Style-Bert-VITS2 JP-Extra** speech synthesis for **iOS 18+** a
 **macOS 15+ on Apple Silicon**. Includes a Swift Package, iPhone/Mac example apps,
 a WAV command-line tool, and a checkpoint-to-Core-ML converter.
 
-[日本語](docs/README.ja.md) · [Conversion](docs/conversion.md) · [Model format](docs/model-format.md)
+[日本語ドキュメント](docs/README.ja.md) · [Conversion](docs/conversion.md) · [Model format](docs/model-format.md)
 · [Licenses](THIRD_PARTY_NOTICES.md) · [Release procedure](docs/releasing.md)
+
+## Documentation
+
+The complete Japanese guide includes a local-file Quick Start, SDK integration, all public
+Swift APIs, troubleshooting, conversion, model format, licensing and release instructions.
+English overview and technical notes remain below and in the linked English pages.
+
+| Task | Guide |
+|---|---|
+| Run the sample from source and model archives | [Quick Start (日本語)](docs/getting-started.ja.md) |
+| Add the SDK to an Xcode app | [SDK integration (日本語)](docs/sdk-guide.ja.md) |
+| Look up methods, options and cancellation | [Swift API reference (日本語)](docs/api-reference.ja.md) |
+| Diagnose loading, latency, audio gaps and storage | [Troubleshooting (日本語)](docs/troubleshooting.ja.md) |
+
+Repository/model hosting URLs are not published yet. The Quick Start uses local model
+archives; obtaining source alone does not download the model weights.
 
 ## Contents
 
@@ -56,23 +72,25 @@ also works. The app's speech synthesis works offline once resources are present.
 Add this repository as a Swift Package, then import `SBV2CoreML`:
 
 ```swift
-let speech = SpeechSynthesizer()
-let info = try await speech.load(ModelPaths(
-    bert: common.appendingPathComponent("bert"),
-    voice: voiceDirectory,
-    dictionary: common.appendingPathComponent("dictionary")))
-try await speech.warmUp()
+import Foundation
+import SBV2CoreML
 
-for try await chunk in speech.stream("こんにちは。お元気ですか？") {
-    // Mono Float32 PCM, chunk.sampleRate == 44100.
-    // Await playback capacity here before requesting the next chunk.
-    consumePCM(chunk.pcm)
+// JVNV sample voice: speaker 0 and Neutral style.
+func renderSample(paths: ModelPaths) async throws -> Data {
+    let speech = SpeechSynthesizer()
+    try await speech.load(paths)
+    try await speech.warmUp()
+    let audio = try await speech.synthesize("こんにちは。お元気ですか？")
+    let wav = try audio.wav()
+    try await speech.unload()
+    return wav
 }
-speech.cancel()
-try await speech.unload()
 ```
 
-`consumePCM` represents your application's audio sink; see `PCMPlayer` in the example.
+`ModelPaths` takes local BERT, voice and dictionary directory URLs. Keep the synthesizer
+loaded between utterances in a chat application. The function above is a single WAV example.
+For sentence-based PCM delivery, use `stream` and await playback capacity before requesting
+the next item; see [complete examples](docs/sdk-guide.ja.md) and `PCMPlayer` in the sample.
 Read `VoiceInfo.styles`/`speakers` when choosing options: not every voice has a `Neutral` style.
 Cancellation takes effect between native inference calls; an in-flight Core ML call is allowed to finish.
 
@@ -104,6 +122,7 @@ This repository does not grant permission to use third-party character artwork o
 ```sh
 swift test
 PYTHONPATH=converter .venv/bin/python -m unittest discover -s converter/tests -v
+python3 scripts/check_docs.py --swift
 ```
 
 No remote repository, package registry or model upload is created by these commands.

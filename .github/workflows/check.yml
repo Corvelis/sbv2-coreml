@@ -10,9 +10,11 @@ jobs:
           python-version: '3.11'
       - run: python -m pip install ./converter
       - run: python -m unittest discover -s converter/tests -v
+      - run: python scripts/check_docs.py
   swift:
     runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
       - run: swift test
+      - run: python3 scripts/check_docs.py --swift
       - run: xcodebuild -project Examples/Apple/SBV2Demo.xcodeproj -scheme SBV2Demo-iOS -configuration Release -destination generic/platform=iOS CODE_SIGNING_ALLOWED=NO build
