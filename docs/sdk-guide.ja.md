@@ -85,52 +85,19 @@ func writeGreetingInDocuments() async throws -> URL {
 `load`と`warmUp`を準備時に行い、文章ごとには`synthesize`または`stream`だけを呼びます。
 入力は日本語の本文です。SDKにMarkdown除去やLLMの出力整形を任せるAPIはありません。
 
-## 擬似ストリーミングと再生
+## 全文を生成して再生する
 
-`stream`は、渡された文章を区間へ分割して返す`AsyncSequence`です。LLMの未確定トークンを継ぎ足すAPIではありません。
-LLM側で読み上げ可能な文章を確定し、SDKへ渡します。
+付属[AudioPlayerとDemoState](../Examples/Apple/SBV2Demo.swift)は、`synthesize`の完了を待ち、
+生成した全文のPCMを1つのバッファとして再生します。次の区間を再生中に合成する処理や、
+再生残り2秒で補充する処理はありません。生成済み音声は再合成せず再再生できます。
 
-```swift
-import Foundation
-import SBV2CoreML
+PCMはFloat32・モノラル・44.1 kHzです。サンプルはFloat32のままAVAudioEngineで再生します。
+ファイル出力用の`wav()`は16 bit PCM WAVへ変換します。
+SDK自体はスピーカーへ再生しません。再生処理とiOSのAVAudioSession管理はアプリ側で行います。
 
-func forwardSpeech(
-    speech: SpeechSynthesizer,
-    text: String,
-    options: SpeechOptions,
-    waitForPlaybackCapacity: () async throws -> Void,
-    enqueuePCM: (SpeechChunk) async throws -> Void
-) async throws {
-    var iterator = speech.stream(text, options: options).makeAsyncIterator()
-    while true {
-        try await waitForPlaybackCapacity()
-        try Task.checkCancellation()
-        guard let chunk = try await iterator.next() else { break }
-        try await enqueuePCM(chunk)
-    }
-}
-```
-
-`waitForPlaybackCapacity`は、アプリが持つ再生キューに空きができるまで待つ処理です。
-付属[PCMPlayerとDemoState](../Examples/Apple/SBV2Demo.swift)は、再生残りが約2秒以下になったら次の`next()`を呼びます。
-再生前は待ち時間を入れず最初の区間を要求し、届いたPCMをすぐキューへ追加します。
-これは区間単位の先行再生です。各区間内のDecoder窓ごとにPCMを返すAPIではありません。
-
-PCMはFloat32・モノラル・44.1 kHzです。`wav()`は16 bit PCM WAVへ変換します。
-SDK自体はスピーカーへ再生しません。AVAudioEngineなどの再生処理と、iOSのAVAudioSession管理はアプリ側で行います。
-会話全文のPCMを保持せず、再生済みのバッファを解放してください。
-
-LLMと併用する場合の優先順位は呼び出し元で制御します。
-
-1. 最初に読める文章が確定するまではLLMを進める。
-2. 最初のTTSを合成して再生キューへ入れる間は、LLMを安全な境界で待機させる。
-3. 再生中はLLMを再開し、次の確定文を用意する。
-4. 再生残り約2秒で次のTTSを要求する。合成時間に応じて余裕を調整する。
-
-SDKにはllama.cpp／LiteRT-LMの停止・再開接続は含まれていません。
-2秒という閾値だけで、すべての機種・モデル・同時負荷で途切れないことを保証するものではありません。
-読み上げ区間を別々の`stream()`へ渡す場合、最初の読点分割の状態は呼び出しごとにリセットされます。
-2回目以降は`TextSegmenter(allowFirstComma: false)`を指定すると、会話側の方針と揃えられます。
+SDKには、区間ごとのPCMが必要なアプリ向けに任意で利用できる`stream` APIもあります。
+付属GUIとCLIのサンプルは全文を生成する`synthesize`を使います。
+詳しい仕様は[APIリファレンス](api-reference.ja.md)を参照してください。
 
 ## 停止と声の切り替え
 

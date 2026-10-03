@@ -29,7 +29,7 @@ archives; obtaining source alone does not download the model weights.
   Japanese text processing uses bundled Open JTalk source and a separately obtained dictionary.
   No Flutter, Python or ONNX Runtime is needed in the application.
 - **Separate voices:** reuse one shared BERT/dictionary with multiple voice packages.
-- **Streaming:** sentence-first, pull-based PCM generation, cancellation, bounded playback in the example.
+- **Sample playback:** generate the complete utterance, then play one Float32 buffer. Replay and cancellation are included.
 - **Conversion:** input an AivisHub URL, one AIVM, or a Safetensors checkpoint with config/style vectors.
   The public conversion path exports directly from PyTorch without an intermediate ONNX file.
 - **Distribution:** model checksums, provenance, license preservation and local HF upload staging.
@@ -59,9 +59,8 @@ Open `Examples/Apple/SBV2Demo.xcodeproj`:
 
 1. Choose `SBV2Demo-iOS` or `SBV2Demo-macOS`.
 2. For iPhone, select your signing team and a unique bundle identifier.
-3. Run the app; select the common folder as **BERT**, then select the voice folder as **Voice**.
-   The dictionary inside the common folder is detected automatically.
-4. Press **準備・ウォームアップ**, then **読み上げ**.
+3. Open **モデル設定** and choose **共通モデル** and **声モデル**. The dictionary is detected automatically.
+4. Press **モデルを準備**, then **生成して再生**. Playback starts after the complete utterance has been generated.
 
 Alternatively enter an HTTPS URL for a release's `download.json`. Each file is downloaded and
 verified before installation. Copying the two model folders into the iOS app's Documents folder
@@ -89,8 +88,9 @@ func renderSample(paths: ModelPaths) async throws -> Data {
 
 `ModelPaths` takes local BERT, voice and dictionary directory URLs. Keep the synthesizer
 loaded between utterances in a chat application. The function above is a single WAV example.
-For sentence-based PCM delivery, use `stream` and await playback capacity before requesting
-the next item; see [complete examples](docs/sdk-guide.ja.md) and `PCMPlayer` in the sample.
+The sample uses `synthesize` and `AudioPlayer` to play a complete utterance.
+The SDK also exposes an optional `stream` API for applications that need segment delivery;
+see the [API reference](docs/api-reference.ja.md).
 Read `VoiceInfo.styles`/`speakers` when choosing options: not every voice has a `Neutral` style.
 Cancellation takes effect between native inference calls; an in-flight Core ML call is allowed to finish.
 

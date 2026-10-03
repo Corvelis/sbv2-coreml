@@ -1,0 +1,182 @@
+{
+  "os" : "Version 27.2 (Build 26B5091g)",
+  "playbackMode" : "complete utterance, single Float32 buffer",
+  "preparationSeconds" : 7.2782733333297074,
+  "replayCompleted" : true,
+  "runs" : [
+    {
+      "audioSeconds" : 3.1695238095238096,
+      "capacitySplit" : false,
+      "case" : "angry",
+      "playbackCompleted" : true,
+      "rtf" : 0.15941210374071837,
+      "style" : "Angry",
+      "synthesisSeconds" : 0.50526045833248645,
+      "text" : "富士山は日本で一番高い山です。",
+      "thermalState" : 0,
+      "timing" : {
+        "playbackCompleted" : 705020.32281733339,
+        "playbackStarted" : 705017.06220179168,
+        "synthesisCompleted" : 705017.06211000006,
+        "synthesisStarted" : 705016.55684954172
+      }
+    },
+    {
+      "audioSeconds" : 3.3088435374149658,
+      "capacitySplit" : false,
+      "case" : "disgust",
+      "playbackCompleted" : true,
+      "rtf" : 0.13674571235912339,
+      "style" : "Disgust",
+      "synthesisSeconds" : 0.45247016660869122,
+      "text" : "富士山は日本で一番高い山です。",
+      "thermalState" : 0,
+      "timing" : {
+        "playbackCompleted" : 705024.2628029167,
+        "playbackStarted" : 705020.80678683333,
+        "synthesisCompleted" : 705020.80672550004,
+        "synthesisStarted" : 705020.35425533343
+      }
+    },
+    {
+      "audioSeconds" : 3.4481632653061225,
+      "capacitySplit" : false,
+      "case" : "fear",
+      "playbackCompleted" : true,
+      "rtf" : 0.13900333929706737,
+      "style" : "Fear",
+      "synthesisSeconds" : 0.4793062083190307,
+      "text" : "富士山は日本で一番高い山です。",
+      "thermalState" : 0,
+      "timing" : {
+        "playbackCompleted" : 705028.3770636667,
+        "playbackStarted" : 705024.80422341672,
+        "synthesisCompleted" : 705024.80417120841,
+        "synthesisStarted" : 705024.32486500009
+      }
+    },
+    {
+      "audioSeconds" : 3.4829931972789114,
+      "capacitySplit" : false,
+      "case" : "happy",
+      "playbackCompleted" : true,
+      "rtf" : 0.13644697190716215,
+      "style" : "Happy",
+      "synthesisSeconds" : 0.47524387494195253,
+      "text" : "富士山は日本で一番高い山です。",
+      "thermalState" : 0,
+      "timing" : {
+        "playbackCompleted" : 705032.54142750008,
+        "playbackStarted" : 705028.97338370839,
+        "synthesisCompleted" : 705028.973332125,
+        "synthesisStarted" : 705028.49808825005
+      }
+    },
+    {
+      "audioSeconds" : 3.3785034013605442,
+      "capacitySplit" : false,
+      "case" : "neutral",
+      "playbackCompleted" : true,
+      "rtf" : 0.13816076808329994,
+      "style" : "Neutral",
+      "synthesisSeconds" : 0.46677662490401417,
+      "text" : "富士山は日本で一番高い山です。",
+      "thermalState" : 0,
+      "timing" : {
+        "playbackCompleted" : 705036.52143529174,
+        "playbackStarted" : 705033.05408025009,
+        "synthesisCompleted" : 705033.05402758333,
+        "synthesisStarted" : 705032.58725095843
+      }
+    },
+    {
+      "audioSeconds" : 3.4597732426303853,
+      "capacitySplit" : false,
+      "case" : "sad",
+      "playbackCompleted" : true,
+      "rtf" : 0.13772209187569365,
+      "style" : "Sad",
+      "synthesisSeconds" : 0.47648720839060843,
+      "text" : "富士山は日本で一番高い山です。",
+      "thermalState" : 0,
+      "timing" : {
+        "playbackCompleted" : 705040.61174104176,
+        "playbackStarted" : 705037.03432937502,
+        "synthesisCompleted" : 705037.03427775006,
+        "synthesisStarted" : 705036.55779054167
+      }
+    },
+    {
+      "audioSeconds" : 3.4713832199546486,
+      "capacitySplit" : false,
+      "case" : "surprise",
+      "playbackCompleted" : true,
+      "rtf" : 0.13785171348668718,
+      "style" : "Surprise",
+      "synthesisSeconds" : 0.47853612503968179,
+      "text" : "富士山は日本で一番高い山です。",
+      "thermalState" : 0,
+      "timing" : {
+        "playbackCompleted" : 705044.72566212504,
+        "playbackStarted" : 705041.13662679167,
+        "synthesisCompleted" : 705041.13654650003,
+        "synthesisStarted" : 705040.65801037499
+      }
+    },
+    {
+      "audioSeconds" : 3.9938321995464854,
+      "capacitySplit" : false,
+      "case" : "sentences",
+      "playbackCompleted" : true,
+      "rtf" : 0.19385642738368089,
+      "style" : "Neutral",
+      "synthesisSeconds" : 0.7742300417739898,
+      "text" : "こんにちは。今日はいい天気ですね。散歩に出かけてみましょう。",
+      "thermalState" : 0,
+      "timing" : {
+        "playbackCompleted" : 705049.63344379165,
+        "playbackStarted" : 705045.53365075006,
+        "synthesisCompleted" : 705045.53360295843,
+        "synthesisStarted" : 705044.75937291665
+      }
+    },
+    {
+      "audioSeconds" : 17.600725623582765,
+      "capacitySplit" : true,
+      "case" : "long",
+      "playbackCompleted" : true,
+      "rtf" : 0.09978703175235,
+      "style" : "Neutral",
+      "synthesisSeconds" : 1.7563241666648537,
+      "text" : "今日は朝から公園を歩いてから駅の近くにある小さな喫茶店で温かいコーヒーを飲んで午後には図書館で旅行の本を読みながら次の休みに行ってみたい場所をゆっくり考えて夕方になったら家に帰って夕食を作ろうと思っています。",
+      "thermalState" : 0,
+      "timing" : {
+        "playbackCompleted" : 705069.17049333337,
+        "playbackStarted" : 705051.43802116672,
+        "synthesisCompleted" : 705051.43797120836,
+        "synthesisStarted" : 705049.6816470417
+      }
+    },
+    {
+      "audioSeconds" : 0.8126984126984127,
+      "capacitySplit" : false,
+      "case" : "short",
+      "playbackCompleted" : true,
+      "rtf" : 0.36417281245121558,
+      "style" : "Neutral",
+      "synthesisSeconds" : 0.29596266662701964,
+      "text" : "こんにちは。",
+      "thermalState" : 0,
+      "timing" : {
+        "playbackCompleted" : 705070.55549145839,
+        "playbackStarted" : 705069.60433075007,
+        "synthesisCompleted" : 705069.60428275005,
+        "synthesisStarted" : 705069.30832008342
+      }
+    }
+  ],
+  "status" : "complete",
+  "stopPassed" : true,
+  "strategy" : "production DemoState and AudioPlayer, no UI automation",
+  "voice" : "jvnv-f1-jp"
+}

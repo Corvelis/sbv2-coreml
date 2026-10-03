@@ -5,7 +5,29 @@
 This is a **pre-release**. The figures below belong to this sample voice and precision
 profile. They are not a guarantee for every voice, text, temperature, or concurrent LLM.
 
-## Sample UI verification — 2026-10-04
+## Redesigned sample and complete-utterance playback — 2026-10-04
+
+The sample now awaits complete `synthesize` output and plays one Float32 buffer.
+It does not synthesize future segments during playback or replenish a two-second queue.
+The main screen focuses on text, voice/style and generation; folders, downloads and licenses
+are in model settings. It supports replay without synthesis, progress, timing metrics and stop.
+
+The production `DemoState` and `AudioPlayer` were exercised directly in the app without
+mirroring or UI automation. Mac and iPhone 17 Pro both completed 10 cases (all seven JVNV
+styles, short text, multiple sentences and a long sentence), replay and stop. Every recorded
+playback start followed full synthesis completion, and the audio player's completion callback
+was received. The Mac main screen and settings were also inspected and operated through the UI.
+
+Raw results: [Mac](verification/macos-sample-full-playback-20261004.json) and
+[iPhone](verification/iphone-sample-full-playback-20261004.json). iPhone single-sentence RTFs
+were approximately 0.096–0.106; the long sentence measured 0.070. These are individual
+observations, not controlled benchmarks or universal performance guarantees. No ASR/LLM
+was included. Playback completion does not establish perceptual audio quality. Hosted HF
+installation and listening comparisons against the original remain pending.
+
+## Historical sample UI verification before redesign — 2026-10-04
+
+This records the previous UI and playback implementation. See the section above for the current sample.
 
 The Mac Release sample was operated through its UI: model-folder selection, automatic
 common BERT/dictionary recognition, preparation/warm-up, short and multi-sentence synthesis,
@@ -98,6 +120,6 @@ and sentence endings. Generated iPhone/Mac WAVs are retained locally for that re
 3. Exercise the HTTPS downloader against those actual hosted manifests on a clean device.
 4. Confirm deployment/signing and license obligations for the intended downstream use.
 
-Long-running thermal behavior, concurrent ASR/LLM scheduling, all styles/speakers and all
+Long-running thermal behavior, concurrent ASR/LLM scheduling, other voices/speakers and all
 supported OS versions are outside this standalone release's measurements. They should not
 be inferred from earlier Local AI benchmarks with different voices.

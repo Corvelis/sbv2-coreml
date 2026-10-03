@@ -118,3 +118,12 @@ Hugging Faceには`checksums.json`に列挙した資産と、`checksums.json`、
 
 コードのSDK化やバイナリ化でライセンス条件は変わりません。[ライセンスと出典](licenses.ja.md)を確認し、
 配布するアプリの条件に合わせて判断してください。この手順はApp Storeでの配布適合性を検証した記録ではありません。
+
+## ロックやミラーリングなしでサンプルの合成・再生を確認する
+
+モデルをサンプルのDocumentsへ配置し、開発ツールから`--sample-check`を渡して起動します。
+このモードは通常の`DemoState`と`AudioPlayer`を使い、モデル準備、7スタイル、短文・複数文・長文、
+再再生、途中停止を確認します。`sbv2-sample-check.json`と`sample-*.wav`をDocumentsへ保存します。
+Macでは`SBV2_SMOKE_ROOT`と`SBV2_SMOKE_OUTPUT`で入力・出力フォルダを指定できます。
+実機テストはアプリを前面に出して実行し、結果ファイルを開発ツールで回収します。
+GUIの配置・操作や、聴覚による音質評価を代わりに保証する試験ではありません。

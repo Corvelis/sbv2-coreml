@@ -7,41 +7,63 @@ import SBV2CoreML
     var body: some Scene { WindowGroup { DemoView() } }
 }
 
-@MainActor final class PCMPlayer {
+/// Plays one complete Float32 buffer after synthesis has finished.
+@MainActor final class AudioPlayer {
     private let engine = AVAudioEngine()
-    private let player = AVAudioPlayerNode()
+    private let node = AVAudioPlayerNode()
     private let format = AVAudioFormat(standardFormatWithSampleRate: 44100, channels: 1)!
-    private var queuedSamples: Int64 = 0
-    init() { engine.attach(player); engine.connect(player, to: engine.mainMixerNode, format: format) }
-    var remaining: Double {
-        guard let time = player.lastRenderTime, let played = player.playerTime(forNodeTime: time) else {
-            return Double(queuedSamples) / 44100
-        }
-        return max(0, Double(queuedSamples - played.sampleTime) / 44100)
+    private var samples: Int64 = 0
+    private var generation = 0
+    private(set) var isPlaying = false
+    init() { engine.attach(node); engine.connect(node, to: engine.mainMixerNode, format: format) }
+    var progress: Double {
+        guard samples > 0, let time = node.lastRenderTime,
+              let played = node.playerTime(forNodeTime: time) else { return 0 }
+        return min(1, max(0, Double(played.sampleTime) / Double(samples)))
     }
-    func append(_ chunk: SpeechChunk) throws {
+    func play(_ audio: SpeechChunk) throws {
+        stop()
         #if os(iOS)
         try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
         try AVAudioSession.sharedInstance().setActive(true)
         #endif
-        if !engine.isRunning { try engine.start() }
-        let count = chunk.pcm.count / 4
-        guard let buffer = AVAudioPCMBuffer(pcmFormat: format, frameCapacity: AVAudioFrameCount(count)),
-              let channel = buffer.floatChannelData?[0] else { return }
-        buffer.frameLength = AVAudioFrameCount(count)
-        chunk.pcm.copyBytes(to: UnsafeMutableRawBufferPointer(start: channel, count: chunk.pcm.count))
-        if let time = player.lastRenderTime, let played = player.playerTime(forNodeTime: time) {
-            queuedSamples = max(queuedSamples, played.sampleTime)
+        let count = audio.pcm.count / MemoryLayout<Float>.stride
+        guard count > 0, count <= Int(UInt32.max),
+              let buffer = AVAudioPCMBuffer(pcmFormat: format, frameCapacity: AVAudioFrameCount(count)),
+              let channel = buffer.floatChannelData?[0] else {
+            throw SBV2Error.synthesis("音声を再生できませんでした。")
         }
-        player.scheduleBuffer(buffer)
-        queuedSamples += Int64(count)
-        if !player.isPlaying { player.play() }
+        buffer.frameLength = AVAudioFrameCount(count)
+        audio.pcm.copyBytes(to: UnsafeMutableRawBufferPointer(start: channel, count: audio.pcm.count))
+        try engine.start()
+        samples = Int64(count)
+        let request = generation
+        node.scheduleBuffer(buffer, completionCallbackType: .dataPlayedBack) { [weak self] _ in
+            Task { @MainActor in
+                guard let self, self.generation == request else { return }
+                self.isPlaying = false
+                self.node.stop()
+                self.engine.stop()
+            }
+        }
+        isPlaying = true
+        node.play()
     }
-    func stop() { player.stop(); engine.stop(); queuedSamples = 0 }
+    func stop() { generation += 1; node.stop(); engine.stop(); samples = 0; isPlaying = false }
 }
 
 @MainActor final class DemoState: ObservableObject {
     enum Asset: String, CaseIterable, Identifiable { case bert = "BERT", voice = "Voice", dictionary = "Dictionary"; var id: String { rawValue } }
+    enum Phase: Equatable { case idle, preparing, generating, playing, downloading, ready, failed }
+    struct Metrics {
+        let synthesisSeconds: Double
+        let audioSeconds: Double
+        let capacitySplit: Bool
+        var rtf: Double { synthesisSeconds / max(audioSeconds, 0.001) }
+    }
+    @Published var phase: Phase = .idle
+    @Published var metrics: Metrics?
+    @Published var playbackProgress = 0.0
     @Published var text = "こんにちは。今日はいい天気ですね。散歩に出かけてみましょう。"
     @Published var status = "BERT、声、辞書のフォルダを選択してください。"
     @Published var selectedStyle = "Neutral"
@@ -53,7 +75,11 @@ import SBV2CoreML
     @Published var downloadURL = ""
     @Published var downloadKind: Asset = .voice
     private let synthesizer = SpeechSynthesizer()
-    private let player = PCMPlayer()
+    private let player = AudioPlayer()
+    private var lastAudio: SpeechChunk?
+    private var timing: [String: Double] = [:]
+    var canReplay: Bool { lastAudio != nil && !busy }
+    var voiceName: String { info?.speakers.keys.sorted().first ?? "声モデルを選択" }
     private var task: Task<Void, Never>?
     private var scopedURLs: [URL] = []
     private var generation = 0
@@ -69,7 +95,9 @@ import SBV2CoreML
             let path = documents.appendingPathComponent(name)
             if FileManager.default.fileExists(atPath: path.path) { assets[kind] = path }
         }
-        if ProcessInfo.processInfo.arguments.contains("--smoke-test") {
+        if ProcessInfo.processInfo.arguments.contains("--sample-check") {
+            Task { await sampleCheck() }
+        } else if ProcessInfo.processInfo.arguments.contains("--smoke-test") {
             Task { await smokeTest() }
         }
     }
@@ -81,13 +109,13 @@ import SBV2CoreML
             assets[.bert] = url.appendingPathComponent("bert")
             assets[.dictionary] = url.appendingPathComponent("dictionary")
         }
-        ready = false; info = nil
+        ready = false; info = nil; metrics = nil; lastAudio = nil; phase = .idle
         status = "\(kind.rawValue): \(url.lastPathComponent)"
     }
     func prepare() {
         guard let bert = assets[.bert], let voice = assets[.voice], let dictionary = assets[.dictionary] else { return }
         stop(); generation += 1; let request = generation
-        busy = true; ready = false; status = "モデルを準備しています。初回はコンパイルに時間がかかります。"
+        busy = true; ready = false; phase = .preparing; status = "モデルを準備しています。初回は少し時間がかかります。"
         task = Task {
             do {
                 let start = ProcessInfo.processInfo.systemUptime
@@ -98,76 +126,162 @@ import SBV2CoreML
                 selectedSpeaker = info.speakers.values.min()!
                 try await synthesizer.warmUp(options: .init(speakerID: selectedSpeaker, style: selectedStyle))
                 try Task.checkCancellation()
-                ready = true
+                ready = true; phase = .ready
                 status = String(format: "準備完了 %.1f秒", ProcessInfo.processInfo.systemUptime - start)
-            } catch { if request == generation { status = error.localizedDescription } }
+            } catch { if request == generation { phase = .failed; status = error.localizedDescription } }
             if request == generation { busy = false }
         }
     }
     func speak() {
-        stop(); busy = true
-        status = "音声を合成しています。"
-        generation += 1; let request = generation
+        guard !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            status = "読み上げたい文章を入力してください。"; return
+        }
+        guard ready else { return }
+        stop(); busy = true; phase = .generating; metrics = nil; playbackProgress = 0
+        status = "音声を生成しています。"
+        let request = generation
         let input = text, options = SpeechOptions(speakerID: selectedSpeaker, style: selectedStyle)
         task = Task {
             do {
                 let started = ProcessInfo.processInfo.systemUptime
-                var first: Double?, totalAudio = 0.0, totalSynthesis = 0.0
-                // Pull the next piece when two seconds of queued playback remain.
-                var iterator = synthesizer.stream(input, options: options).makeAsyncIterator()
-                while true {
-                    while player.remaining > 2 {
-                        try await Task.sleep(nanoseconds: 50_000_000)
-                    }
-                    try Task.checkCancellation()
-                    guard let chunk = try await iterator.next() else { break }
-                    try Task.checkCancellation()
-                    if first == nil { first = ProcessInfo.processInfo.systemUptime - started }
-                    try player.append(chunk)
-                    totalAudio += chunk.duration; totalSynthesis += chunk.synthesisSeconds
-                    status = String(format: "最初のPCM %.2f秒 · RTF %.3f · 再生残り %.1f秒%@",
-                        first!, totalSynthesis / max(totalAudio, 0.001), player.remaining,
-                        chunk.capacitySplit ? " · モデル上限で分割" : "")
-                }
-                while player.remaining > 0.05 { try await Task.sleep(nanoseconds: 50_000_000) }
+                // Return the complete utterance before starting playback.
+                let audio = try await synthesizer.synthesize(input, options: options)
                 try Task.checkCancellation()
-                if request == generation {
-                    if let first {
-                        status = String(format: "再生完了 · 最初のPCM %.2f秒 · RTF %.3f · 音声 %.1f秒",
-                            first, totalSynthesis / max(totalAudio, 0.001), totalAudio)
-                    } else {
-                        status = "読み上げる文章を入力してください。"
-                    }
-                }
+                guard request == generation else { return }
+                let completed = ProcessInfo.processInfo.systemUptime
+                guard !audio.pcm.isEmpty else { throw SBV2Error.synthesis("音声を生成できませんでした。") }
+                lastAudio = audio
+                metrics = Metrics(synthesisSeconds: completed - started, audioSeconds: audio.duration,
+                    capacitySplit: audio.capacitySplit)
+                timing = ["synthesisStarted": started, "synthesisCompleted": completed]
+                try await play(audio, request: request)
             } catch {
-                if request == generation { status = error.localizedDescription }
+                if request == generation { phase = .failed; status = error.localizedDescription; player.stop() }
             }
+            if request == generation { busy = false }
+        }
+    }
+    private func play(_ audio: SpeechChunk, request: Int) async throws {
+        try Task.checkCancellation()
+        timing["playbackStarted"] = ProcessInfo.processInfo.systemUptime
+        try player.play(audio)
+        phase = .playing; status = "再生中"; playbackProgress = 0
+        while player.isPlaying {
+            try await Task.sleep(nanoseconds: 100_000_000)
+            try Task.checkCancellation()
+            guard request == generation else { return }
+            playbackProgress = player.progress
+        }
+        try Task.checkCancellation()
+        guard request == generation else { return }
+        playbackProgress = 1; phase = .ready; status = "再生完了"
+        timing["playbackCompleted"] = ProcessInfo.processInfo.systemUptime
+    }
+    func replay() {
+        guard let audio = lastAudio, !busy else { return }
+        stop(); busy = true
+        let request = generation
+        task = Task {
+            do { try await play(audio, request: request) }
+            catch { if request == generation { phase = .failed; status = error.localizedDescription } }
             if request == generation { busy = false }
         }
     }
     func stop() {
         generation += 1; task?.cancel(); task = nil; synthesizer.cancel(); player.stop(); busy = false
-        status = "停止しました。"
+        playbackProgress = 0; phase = ready ? .ready : .idle; status = "停止しました。"
     }
     func download() {
         guard let url = URL(string: downloadURL), url.scheme == "https" else { status = "HTTPSのdownload.json URLを入力してください。"; return }
+        stop(); let request = generation
         let kind = downloadKind
-        busy = true; status = "ダウンロード中…"
+        busy = true; phase = .downloading; status = "ダウンロード中…"
         task = Task {
             do {
                 let destination = documents.appendingPathComponent("\(kind.rawValue.lowercased())-\(UUID().uuidString)")
                 try await ModelDownloader().install(manifestURL: url, destination: destination) { done, total in
-                    await MainActor.run { self.status = "取得・検証 \(done)/\(total)" }
+                    await MainActor.run { if request == self.generation { self.status = "取得・検証 \(done)/\(total)" } }
                 }
+                try Task.checkCancellation()
+                guard request == generation else { return }
                 assets[kind] = destination
                 if kind == .bert, FileManager.default.fileExists(atPath: destination.appendingPathComponent("bert/vocab.txt").path) {
                     assets[.bert] = destination.appendingPathComponent("bert")
                     assets[.dictionary] = destination.appendingPathComponent("dictionary")
                 }
-                ready = false
+                ready = false; info = nil; lastAudio = nil; metrics = nil; phase = .idle
                 status = "取得完了: \(kind.rawValue)"
-            } catch { status = error.localizedDescription }
-            busy = false
+            } catch { if request == generation { phase = .failed; status = error.localizedDescription } }
+            if request == generation { busy = false }
+        }
+    }
+
+    /// Runs the production sample controller and audio player without UI automation or mirroring.
+    func sampleCheck() async {
+        let base = ProcessInfo.processInfo.environment["SBV2_SMOKE_ROOT"].map { URL(fileURLWithPath: $0) } ?? documents
+        let output = ProcessInfo.processInfo.environment["SBV2_SMOKE_OUTPUT"].map { URL(fileURLWithPath: $0) } ?? documents
+        var report: [String: Any] = ["os": ProcessInfo.processInfo.operatingSystemVersionString,
+            "voice": "jvnv-f1-jp", "playbackMode": "complete utterance, single Float32 buffer",
+            "strategy": "production DemoState and AudioPlayer, no UI automation", "status": "running"]
+        var runs: [[String: Any]] = []
+        #if os(iOS)
+        UIApplication.shared.isIdleTimerDisabled = true
+        defer { UIApplication.shared.isIdleTimerDisabled = false }
+        #endif
+        func waitForCompletion() async throws {
+            let deadline = ProcessInfo.processInfo.systemUptime + 180
+            while busy {
+                guard ProcessInfo.processInfo.systemUptime < deadline else {
+                    stop(); throw SBV2Error.synthesis("Sample operation timed out")
+                }
+                try await Task.sleep(nanoseconds: 100_000_000)
+            }
+            guard phase != .failed else { throw SBV2Error.synthesis(status) }
+        }
+        do {
+            try FileManager.default.createDirectory(at: output, withIntermediateDirectories: true)
+            select(base.appendingPathComponent("sbv2-coreml-common"), kind: .bert)
+            select(base.appendingPathComponent("sbv2-coreml-jvnv-f1-jp"), kind: .voice)
+            guard assets.count == 3 else { throw SBV2Error.invalidModel("Common model/dictionary not detected") }
+            let started = ProcessInfo.processInfo.systemUptime
+            prepare(); try await waitForCompletion()
+            guard ready, let info else { throw SBV2Error.notLoaded }
+            report["preparationSeconds"] = ProcessInfo.processInfo.systemUptime - started
+            var cases = info.styles.keys.sorted().map { ($0.lowercased(), "富士山は日本で一番高い山です。", $0) }
+            cases += [("sentences", "こんにちは。今日はいい天気ですね。散歩に出かけてみましょう。", "Neutral"),
+                ("long", "今日は朝から公園を歩いてから駅の近くにある小さな喫茶店で温かいコーヒーを飲んで午後には図書館で旅行の本を読みながら次の休みに行ってみたい場所をゆっくり考えて夕方になったら家に帰って夕食を作ろうと思っています。", "Neutral"),
+                ("short", "こんにちは。", "Neutral")]
+            for (label, input, style) in cases {
+                text = input; selectedStyle = style
+                speak(); try await waitForCompletion()
+                guard let audio = lastAudio, let metrics, timing["synthesisCompleted"] != nil,
+                      let playback = timing["playbackStarted"], let synthesis = timing["synthesisCompleted"],
+                      playback >= synthesis, phase == .ready, !player.isPlaying, playbackProgress == 1 else {
+                    throw SBV2Error.synthesis("Playback did not complete after full synthesis")
+                }
+                try audio.wav().write(to: output.appendingPathComponent("sample-\(label).wav"), options: .atomic)
+                runs.append(["case": label, "style": style, "text": input,
+                    "synthesisSeconds": metrics.synthesisSeconds, "audioSeconds": metrics.audioSeconds,
+                    "rtf": metrics.rtf, "capacitySplit": audio.capacitySplit,
+                    "timing": timing, "playbackCompleted": true,
+                    "thermalState": ProcessInfo.processInfo.thermalState.rawValue])
+            }
+            replay(); try await waitForCompletion()
+            report["replayCompleted"] = phase == .ready && playbackProgress == 1
+            replay(); try await Task.sleep(nanoseconds: 150_000_000)
+            stop()
+            guard !busy, !player.isPlaying, status == "停止しました。" else {
+                throw SBV2Error.synthesis("Stop did not stop the sample player")
+            }
+            report["stopPassed"] = true
+            report["status"] = "complete"; status = "実機確認完了"; phase = .ready
+        } catch {
+            report["status"] = "failed"; report["error"] = error.localizedDescription
+            stop(); phase = .failed; status = error.localizedDescription
+        }
+        report["runs"] = runs
+        if let data = try? JSONSerialization.data(withJSONObject: report, options: [.prettyPrinted, .sortedKeys]) {
+            try? data.write(to: output.appendingPathComponent("sbv2-sample-check.json"), options: .atomic)
         }
     }
 
@@ -219,54 +333,210 @@ import SBV2CoreML
     }
 }
 
+private enum DemoStyle {
+    static let accent = Color(red: 0.12, green: 0.48, blue: 0.44)
+    static let background = Color.primary.opacity(0.035)
+    static let names = ["Neutral": "標準", "Happy": "うれしい", "Sad": "悲しい", "Angry": "怒り",
+                        "Fear": "不安", "Disgust": "嫌悪", "Surprise": "驚き"]
+}
+
 struct DemoView: View {
     @StateObject private var state = DemoState()
+    @State private var showingModels = false
+    @FocusState private var editing: Bool
+
+    private var actionTitle: String {
+        if state.busy {
+            switch state.phase {
+            case .preparing: return "準備中…"
+            case .playing: return "再生中"
+            case .downloading: return "取得中…"
+            default: return "生成中…"
+            }
+        }
+        if state.assets.count != 3 { return "モデルを選ぶ" }
+        return state.ready ? "生成して再生" : "モデルを準備"
+    }
+    private var statusSymbol: String {
+        switch state.phase {
+        case .ready: return "checkmark.circle.fill"
+        case .playing: return "speaker.wave.2.fill"
+        case .failed: return "exclamationmark.circle"
+        default: return "circle"
+        }
+    }
+    var body: some View {
+        VStack(spacing: 0) {
+            HStack(spacing: 12) {
+                Image(systemName: "waveform").font(.title3.weight(.semibold))
+                    .foregroundStyle(DemoStyle.accent)
+                    .frame(width: 42, height: 42)
+                    .background(DemoStyle.accent.opacity(0.09), in: RoundedRectangle(cornerRadius: 14))
+                VStack(alignment: .leading, spacing: 3) {
+                    Text("音声をつくる").font(.title3.weight(.semibold))
+                    Text("Style-Bert-VITS2 · Core ML").font(.caption).foregroundStyle(.secondary)
+                }
+                Spacer()
+                Button { editing = false; showingModels = true } label: {
+                    Image(systemName: "slider.horizontal.3").font(.body.weight(.medium)).frame(width: 38, height: 38)
+                }
+                .buttonStyle(.plain).background(DemoStyle.background, in: Circle())
+                .accessibilityLabel("モデル設定").help("モデル設定").disabled(state.busy)
+            }.frame(maxWidth: 640).padding(.horizontal, 24).padding(.top, 20).padding(.bottom, 18)
+                .frame(maxWidth: .infinity)
+            ScrollView {
+                VStack(alignment: .leading, spacing: 20) {
+                    VStack(alignment: .leading, spacing: 12) {
+                        HStack {
+                            Label(state.voiceName, systemImage: "person.wave.2")
+                                .font(.subheadline.weight(.medium)).lineLimit(1)
+                            Spacer(minLength: 8)
+                            if let info = state.info {
+                                Picker("スタイル", selection: $state.selectedStyle) {
+                                    ForEach(info.styles.keys.sorted(), id: \.self) {
+                                        Text(DemoStyle.names[$0] ?? $0).tag($0)
+                                    }
+                                }.labelsHidden().pickerStyle(.menu).disabled(state.busy)
+                                    .accessibilityLabel("スタイル")
+                            }
+                        }
+                        if let info = state.info, info.speakers.count > 1 {
+                            Picker("話者", selection: $state.selectedSpeaker) {
+                                ForEach(info.speakers.keys.sorted(), id: \.self) { Text($0).tag(info.speakers[$0]!) }
+                            }.disabled(state.busy)
+                        }
+                        Divider()
+                        ZStack(alignment: .topLeading) {
+                            if state.text.isEmpty {
+                                Text("読み上げたい文章を入力してください")
+                                    .foregroundStyle(.tertiary).padding(.top, 8).padding(.leading, 5)
+                            }
+                            TextEditor(text: $state.text).font(.body).scrollContentBackground(.hidden)
+                                .frame(minHeight: 220).focused($editing)
+                                .accessibilityLabel("読み上げる文章")
+                        }
+                        HStack {
+                            Text("端末内で音声を生成します").font(.caption).foregroundStyle(.secondary)
+                            Spacer()
+                            Text("\(state.text.count)文字").font(.caption.monospacedDigit()).foregroundStyle(.tertiary)
+                        }
+                    }
+                    .padding(18).background(.background, in: RoundedRectangle(cornerRadius: 22))
+                    .overlay(RoundedRectangle(cornerRadius: 22).strokeBorder(.primary.opacity(0.07), lineWidth: 1))
+
+                    HStack(alignment: .top, spacing: 9) {
+                        if state.busy && state.phase != .playing { ProgressView().controlSize(.small) }
+                        else { Image(systemName: statusSymbol).foregroundStyle(state.phase == .failed ? Color.orange : DemoStyle.accent) }
+                        Text(state.status).font(.subheadline).foregroundStyle(.secondary).textSelection(.enabled)
+                    }.frame(maxWidth: .infinity, alignment: .leading)
+                    if state.phase == .playing { ProgressView(value: state.playbackProgress).tint(DemoStyle.accent) }
+                    if let metrics = state.metrics {
+                        HStack(spacing: 0) {
+                            metric("生成時間", String(format: "%.2f秒", metrics.synthesisSeconds))
+                            metric("音声の長さ", String(format: "%.1f秒", metrics.audioSeconds))
+                            metric("RTF", String(format: "%.3f", metrics.rtf))
+                        }.padding(.vertical, 14).background(DemoStyle.background, in: RoundedRectangle(cornerRadius: 16))
+                    }
+                }.frame(maxWidth: 640).padding(.horizontal, 24).padding(.bottom, 24)
+                .frame(maxWidth: .infinity)
+            }
+            HStack(spacing: 12) {
+                Button {
+                    editing = false
+                    if state.assets.count != 3 { showingModels = true }
+                    else if !state.ready { state.prepare() }
+                    else { state.speak() }
+                } label: {
+                    Label(actionTitle, systemImage: state.ready ? "waveform" : "sparkle")
+                        .font(.body.weight(.semibold)).frame(maxWidth: .infinity).padding(.vertical, 6)
+                }.buttonStyle(.borderedProminent).tint(DemoStyle.accent).controlSize(.large)
+                    .disabled(state.busy || (state.ready && state.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty))
+                if state.busy {
+                    Button(action: state.stop) { Image(systemName: "stop.fill").frame(width: 24, height: 30) }
+                        .buttonStyle(.bordered).controlSize(.large).accessibilityLabel("停止")
+                } else if state.canReplay {
+                    Button(action: state.replay) { Image(systemName: "arrow.counterclockwise").frame(width: 24, height: 30) }
+                        .buttonStyle(.bordered).controlSize(.large).accessibilityLabel("もう一度再生").help("もう一度再生")
+                }
+            }.frame(maxWidth: 640).padding(.horizontal, 24).padding(.vertical, 18).frame(maxWidth: .infinity)
+                .background(.bar)
+        }
+        .background(DemoStyle.background)
+        .tint(DemoStyle.accent)
+        .sheet(isPresented: $showingModels) { ModelSettings(state: state) }
+        #if os(macOS)
+        .frame(minWidth: 500, idealWidth: 580, minHeight: 600, idealHeight: 680)
+        #else
+        .toolbar {
+            ToolbarItemGroup(placement: .keyboard) { Spacer(); Button("完了") { editing = false } }
+        }
+        #endif
+    }
+    private func metric(_ label: String, _ value: String) -> some View {
+        VStack(spacing: 5) {
+            Text(value).font(.subheadline.weight(.semibold).monospacedDigit())
+            Text(label).font(.caption).foregroundStyle(.secondary)
+        }.frame(maxWidth: .infinity)
+    }
+}
+
+struct ModelSettings: View {
+    @ObservedObject var state: DemoState
+    @Environment(\.dismiss) private var dismiss
     @State private var importing = false
     @State private var selectedAsset: DemoState.Asset = .bert
     var body: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            Text("SBV2 Core ML").font(.title2.bold())
-            Text("iPhone / Mac · JP-Extra · オフライン音声合成").font(.caption).foregroundStyle(.secondary)
-            DisclosureGroup("モデル・辞書") {
-                ForEach(DemoState.Asset.allCases) { kind in
-                    HStack {
-                        Button(kind.rawValue) { selectedAsset = kind; importing = true }.disabled(state.busy)
-                        Text(state.assets[kind]?.lastPathComponent ?? "未選択").font(.caption).lineLimit(1)
-                    }.frame(maxWidth: .infinity, alignment: .leading)
+        NavigationStack {
+            Form {
+                Section("使用するモデル") {
+                    folder("共通モデル", kind: .bert, symbol: "square.stack.3d.up")
+                    folder("声モデル", kind: .voice, symbol: "person.wave.2")
+                    DisclosureGroup("辞書を個別に指定") { folder("日本語辞書", kind: .dictionary, symbol: "book.closed") }
                 }
-                Picker("取得する資産", selection: $state.downloadKind) { ForEach(DemoState.Asset.allCases) { Text($0.rawValue).tag($0) } }
-                TextField("公開先の download.json URL", text: $state.downloadURL).textFieldStyle(.roundedBorder)
-                Button("取得して検証", action: state.download).disabled(state.busy)
-            }
-            HStack {
-                Button("準備・ウォームアップ", action: state.prepare).disabled(state.busy || state.assets.count != 3)
-                if let info = state.info {
-                    Picker("スタイル", selection: $state.selectedStyle) {
-                        ForEach(info.styles.keys.sorted(), id: \.self) { Text($0).tag($0) }
-                    }.disabled(state.busy)
-                    if info.speakers.count > 1 {
-                        Picker("話者", selection: $state.selectedSpeaker) {
-                            ForEach(info.speakers.keys.sorted(), id: \.self) { Text($0).tag(info.speakers[$0]!) }
-                        }.disabled(state.busy)
+                Section {
+                    Button("準備・ウォームアップ", action: state.prepare).disabled(state.busy || state.assets.count != 3)
+                    Text(state.status).font(.caption).foregroundStyle(.secondary)
+                } footer: {
+                    Text("共通フォルダを選ぶとBERTと辞書を自動で読み取ります。初回の準備には時間がかかります。")
+                }
+                Section {
+                    DisclosureGroup("URLからモデルを取得") {
+                        Picker("取得するモデル", selection: $state.downloadKind) {
+                            Text("共通モデル").tag(DemoState.Asset.bert)
+                            Text("声モデル").tag(DemoState.Asset.voice)
+                        }
+                        TextField("download.json のHTTPS URL", text: $state.downloadURL).textFieldStyle(.roundedBorder)
+                        Button("ダウンロード", action: state.download).disabled(state.busy)
                     }
                 }
-            }
-            TextEditor(text: $state.text).frame(minHeight: 180).border(.secondary.opacity(0.3))
-            HStack {
-                Button("読み上げ", action: state.speak).disabled(!state.ready || state.busy)
-                Button("停止", action: state.stop)
-            }
-            Text(state.status).font(.caption).textSelection(.enabled)
-            Text("コード: AGPL-3.0。音声・BERT・辞書にはそれぞれの利用条件が適用されます。")
-                .font(.caption2).foregroundStyle(.secondary)
+                Section {
+                    Text("サンプル・SDK：AGPL-3.0").font(.caption)
+                    Text("音声モデル・BERT・辞書には、それぞれのライセンスが適用されます。")
+                        .font(.caption).foregroundStyle(.secondary)
+                }
+            }.formStyle(.grouped).navigationTitle("モデル設定")
+                .toolbar { ToolbarItem(placement: .confirmationAction) { Button("完了") { dismiss() } } }
         }
-        .padding()
+        .tint(DemoStyle.accent)
         .fileImporter(isPresented: $importing, allowedContentTypes: [.folder]) { result in
             do { state.select(try result.get(), kind: selectedAsset) }
             catch { state.status = error.localizedDescription }
         }
         #if os(macOS)
-        .frame(minWidth: 620, minHeight: 560)
+        .frame(width: 500, height: 540)
         #endif
+    }
+    private func folder(_ title: String, kind: DemoState.Asset, symbol: String) -> some View {
+        Button { selectedAsset = kind; importing = true } label: {
+            HStack(spacing: 12) {
+                Image(systemName: symbol).frame(width: 24).foregroundStyle(DemoStyle.accent)
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(title).foregroundStyle(.primary)
+                    Text(state.assets[kind]?.lastPathComponent ?? "未選択").font(.caption).foregroundStyle(.secondary).lineLimit(1)
+                }
+                Spacer()
+                Image(systemName: "folder").foregroundStyle(.secondary)
+            }.padding(.vertical, 5)
+        }.buttonStyle(.plain).disabled(state.busy)
     }
 }
