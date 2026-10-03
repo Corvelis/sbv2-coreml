@@ -5,6 +5,25 @@
 This is a **pre-release**. The figures below belong to this sample voice and precision
 profile. They are not a guarantee for every voice, text, temperature, or concurrent LLM.
 
+## Sample UI verification — 2026-10-04
+
+The Mac Release sample was operated through its UI: model-folder selection, automatic
+common BERT/dictionary recognition, preparation/warm-up, short and multi-sentence synthesis,
+playback-queue completion, and all seven JVNV styles. Stopping and restarting long speech
+also worked. Cold preparation displayed 31.6 seconds; after restarting with compiled caches,
+preparation displayed 7.6 seconds. These are individual UI observations, not a controlled benchmark.
+
+The sample displayed stale playback time after completion or stopping. Its status messages
+were corrected and verified on Mac. No inference code or model weights changed. Both Release
+targets built successfully; the updated iPhone sample was installed and launched on iPhone 17 Pro.
+
+iPhone UI operation is pending: iPhone Mirroring requires the physical phone to be locked.
+Earlier device synthesis tests do not establish that the current UI checks passed on iPhone.
+Hosted Hugging Face download checks and listening comparisons against the original remain
+pending. Playback-queue completion does not establish perceptual voice quality.
+Individual observations and remaining checks are recorded in the
+[UI verification report](verification/sdk-ui-20261004.json).
+
 ## Build and integration
 
 - Swift Package release build and 7 unit tests: passed.

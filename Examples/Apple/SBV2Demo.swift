@@ -106,6 +106,7 @@ import SBV2CoreML
     }
     func speak() {
         stop(); busy = true
+        status = "音声を合成しています。"
         generation += 1; let request = generation
         let input = text, options = SpeechOptions(speakerID: selectedSpeaker, style: selectedStyle)
         task = Task {
@@ -129,13 +130,25 @@ import SBV2CoreML
                         chunk.capacitySplit ? " · モデル上限で分割" : "")
                 }
                 while player.remaining > 0.05 { try await Task.sleep(nanoseconds: 50_000_000) }
+                try Task.checkCancellation()
+                if request == generation {
+                    if let first {
+                        status = String(format: "再生完了 · 最初のPCM %.2f秒 · RTF %.3f · 音声 %.1f秒",
+                            first, totalSynthesis / max(totalAudio, 0.001), totalAudio)
+                    } else {
+                        status = "読み上げる文章を入力してください。"
+                    }
+                }
             } catch {
                 if request == generation { status = error.localizedDescription }
             }
             if request == generation { busy = false }
         }
     }
-    func stop() { generation += 1; task?.cancel(); task = nil; synthesizer.cancel(); player.stop(); busy = false }
+    func stop() {
+        generation += 1; task?.cancel(); task = nil; synthesizer.cancel(); player.stop(); busy = false
+        status = "停止しました。"
+    }
     func download() {
         guard let url = URL(string: downloadURL), url.scheme == "https" else { status = "HTTPSのdownload.json URLを入力してください。"; return }
         let kind = downloadKind

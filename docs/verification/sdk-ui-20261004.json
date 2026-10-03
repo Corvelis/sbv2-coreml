@@ -1,0 +1,102 @@
+{
+  "date": "2026-10-04",
+  "source_base_commit": "e837059d2afd537218a324dd27861b5f92fceb74",
+  "voice": "JVNV F1 JP-Extra",
+  "platform": "Apple M2 Mac, Release sample UI",
+  "evidence": "Native accessibility state observed after operating the sample UI",
+  "checks": {
+    "folder_selection": "passed",
+    "common_bert_dictionary_auto_detection": "passed",
+    "cold_preparation_seconds": 31.6,
+    "cached_preparation_after_app_restart_seconds": 7.6,
+    "styles_completed": [
+      "Neutral",
+      "Angry",
+      "Disgust",
+      "Fear",
+      "Happy",
+      "Sad",
+      "Surprise"
+    ],
+    "multiple_sentences_playback_queue_completion": "passed",
+    "long_sentence_capacity_splitting": "passed",
+    "stop_and_restart": "passed",
+    "completed_status": "passed",
+    "stopped_status": "passed",
+    "empty_text_message": "passed",
+    "non_https_url_message": "passed",
+    "model_copy_hashes_verified": {
+      "common_files": 22,
+      "voice_files": 15
+    }
+  },
+  "observations": [
+    {
+      "style": "Neutral",
+      "text_kind": "greeting",
+      "first_pcm_seconds": 0.34,
+      "rtf": 0.435,
+      "audio_seconds": 0.8
+    },
+    {
+      "style": "Angry",
+      "text": "富士山は日本で一番高い山です。",
+      "first_pcm_seconds": 0.91,
+      "rtf": 0.281,
+      "audio_seconds": 3.2
+    },
+    {
+      "style": "Disgust",
+      "text": "富士山は日本で一番高い山です。",
+      "first_pcm_seconds": 0.58,
+      "rtf": 0.18,
+      "audio_seconds": 3.2
+    },
+    {
+      "style": "Fear",
+      "text": "富士山は日本で一番高い山です。",
+      "first_pcm_seconds": 0.57,
+      "rtf": 0.164,
+      "audio_seconds": 3.5
+    },
+    {
+      "style": "Sad",
+      "text": "富士山は日本で一番高い山です。",
+      "first_pcm_seconds": 0.59,
+      "rtf": 0.172,
+      "audio_seconds": 3.4
+    },
+    {
+      "style": "Surprise",
+      "text": "富士山は日本で一番高い山です。",
+      "first_pcm_seconds": 0.59,
+      "rtf": 0.174,
+      "audio_seconds": 3.4
+    },
+    {
+      "style": "Surprise",
+      "text_kind": "long_sentence_after_stop",
+      "first_pcm_seconds": 0.58,
+      "rtf": 0.129,
+      "audio_seconds": 17.4
+    }
+  ],
+  "iphone": {
+    "device": "iPhone 17 Pro",
+    "release_build": "passed",
+    "install": "passed",
+    "launch": "passed",
+    "ui_checks": "pending",
+    "reason": "iPhone Mirroring requires the physical device to be locked"
+  },
+  "remaining": [
+    "iPhone UI checks",
+    "Perceptual listening comparison against original",
+    "Hosted Hugging Face download on clean device"
+  ],
+  "limitations": [
+    "Individual rounded UI observations, not controlled performance benchmarks",
+    "Playback queue consumption does not prove audible or perceptual quality",
+    "No ASR or LLM in the standalone sample checks"
+  ]
+}
