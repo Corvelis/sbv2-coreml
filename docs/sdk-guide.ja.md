@@ -2,6 +2,11 @@
 
 [ドキュメント一覧](README.ja.md) · [APIリファレンス](api-reference.ja.md)
 
+このページは自分のアプリへSDKを組み込む開発者向けです。
+付属アプリを操作するだけなら[クイックスタート](getting-started.ja.md)と
+[サンプルアプリの使い方](sample-app.ja.md)を参照してください。
+SDK、共通モデル、声モデルは別の配布物です。Swift Packageを追加してもモデルは自動取得されません。
+
 ## Xcodeへ追加する
 
 1. iOSまたはmacOSのアプリプロジェクトを開く。

@@ -62,6 +62,8 @@ Open `Examples/Apple/SBV2Demo.xcodeproj`:
 3. Open **モデル設定** and choose **共通モデル** and **声モデル**. The dictionary is detected automatically.
 4. Press **モデルを準備**, then **生成して再生**. Playback starts after the complete utterance has been generated.
 
+The [sample app guide (Japanese)](docs/sample-app.ja.md) explains each control, styles, replay, RTF and voice switching.
+
 Alternatively enter an HTTPS URL for a release's `download.json`. Each file is downloaded and
 verified before installation. Copying the two model folders into the iOS app's Documents folder
 also works. The app's speech synthesis works offline once resources are present.

@@ -4,12 +4,14 @@ require 'xcodeproj'
 root = File.expand_path('..', __dir__)
 project = Xcodeproj::Project.new(File.join(root, 'Examples/Apple/SBV2Demo.xcodeproj'))
 source = project.main_group.new_file('SBV2Demo.swift')
+assets = project.main_group.new_file('Assets.xcassets')
 package = project.new(Xcodeproj::Project::Object::XCLocalSwiftPackageReference)
 package.relative_path = '../..'
 project.root_object.package_references << package
 [['SBV2Demo-iOS', :ios, '18.0'], ['SBV2Demo-macOS', :osx, '15.0']].each do |name, platform, version|
   target = project.new_target(:application, name, platform, version)
   target.source_build_phase.add_file_reference(source)
+  target.resources_build_phase.add_file_reference(assets)
   dependency = project.new(Xcodeproj::Project::Object::XCSwiftPackageProductDependency)
   dependency.package = package
   dependency.product_name = 'SBV2CoreML'
@@ -23,6 +25,8 @@ project.root_object.package_references << package
       'PRODUCT_NAME' => 'SBV2Demo', 'GENERATE_INFOPLIST_FILE' => 'YES',
       'SWIFT_VERSION' => '5.0', 'MARKETING_VERSION' => '0.1.0', 'CURRENT_PROJECT_VERSION' => '1',
       'CODE_SIGN_STYLE' => 'Automatic', 'INFOPLIST_KEY_CFBundleDisplayName' => 'SBV2 Core ML',
+      'ASSETCATALOG_COMPILER_APPICON_NAME' => platform == :ios ? 'AppIcon' : 'AppIconMac',
+      'ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME' => 'AccentColor',
       'INFOPLIST_KEY_UIFileSharingEnabled' => 'YES', 'INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace' => 'YES',
       'INFOPLIST_KEY_UILaunchScreen_Generation' => 'YES', 'ENABLE_APP_SANDBOX' => 'NO',
       'ENABLE_HARDENED_RUNTIME' => 'YES'

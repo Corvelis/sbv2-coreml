@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0C9E554811E54584B2D1B030 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1A2C8C40DE4440CF97DBB64C /* Assets.xcassets */; };
+		17D33C9B11564CE5A6DDBD17 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1A2C8C40DE4440CF97DBB64C /* Assets.xcassets */; };
 		0637FB57D85FBEABEE4FA6BF /* SBV2CoreML in Frameworks */ = {isa = PBXBuildFile; productRef = 7ED7569F7282A5DA2CB01315 /* SBV2CoreML */; };
 		22D674E470F185AC230EF855 /* SBV2Demo.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEC6BA314B12C69B59024DBE /* SBV2Demo.swift */; };
 		2F7A5BB7589A13FD431A45E6 /* SBV2CoreML in Frameworks */ = {isa = PBXBuildFile; productRef = 44C5C0467AAEF7BBE3A93427 /* SBV2CoreML */; };
@@ -16,6 +18,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		1A2C8C40DE4440CF97DBB64C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		2EBC6755F5DB14004E54BCA0 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		54A6AC77FA8FC8DF74D5736F /* SBV2Demo-macOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "SBV2Demo-macOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		B4BBE81AA08D4CA3B50735A0 /* SBV2Demo-iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "SBV2Demo-iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -51,6 +54,7 @@
 				E5828B994DDD7563FFB3F3F4 /* Products */,
 				920A1AADD31B6B40CBCF9CCB /* Frameworks */,
 				BEC6BA314B12C69B59024DBE /* SBV2Demo.swift */,
+				1A2C8C40DE4440CF97DBB64C /* Assets.xcassets */,
 			);
 			sourceTree = "<group>";
 		};
@@ -169,6 +173,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0C9E554811E54584B2D1B030 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -176,6 +181,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				17D33C9B11564CE5A6DDBD17 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -205,7 +211,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = arm64;
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIconMac;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -399,7 +405,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = arm64;
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIconMac;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;

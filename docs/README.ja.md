@@ -8,6 +8,7 @@ Style-Bert-VITS2 JP-ExtraをiPhone／Apple Silicon Macで使うためのSDK、�
 | やりたいこと | 最初に読むページ |
 |---|---|
 | サンプルで音声を出す | [クイックスタート](getting-started.ja.md) |
+| サンプルのボタン、スタイル、時間表示を調べる | [サンプルアプリの使い方](sample-app.ja.md) |
 | 自分のXcodeプロジェクトへ組み込む | [SDK導入・実装ガイド](sdk-guide.ja.md) |
 | メソッド、引数、停止処理を調べる | [Swift APIリファレンス](api-reference.ja.md) |
 | AivisHubや自作モデルの声を使う | [変換ガイド・CLIリファレンス](conversion.ja.md) |
