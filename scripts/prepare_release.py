@@ -44,42 +44,75 @@ def seal(root):
     write(root/'download.json',{'formatVersion':1,'name':root.name,'files':[
         {'path':name,'sha256':sha(root/name),'bytes':(root/name).stat().st_size} for name in entries]})
 
+def write_model_cards(common, voice):
+    """Japanese is the primary model card; English is a separate companion."""
+    for folder, kind in ((common, 'common'), (voice, 'voice')):
+        for name in ('README.md', 'README.en.md'):
+            shutil.copy2(ROOT/'scripts/model-cards'/kind/name, folder/name)
+
+
 def link_huggingface_cards(common, voice, owner):
-    """Add companion-repository links before sealing a publisher's upload folders."""
+    """Add companion-repository links in both documentation languages."""
     if not owner or any(c not in 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_' for c in owner):
         raise ValueError('Hugging Face owner must be a user or organization name')
     for folder, companion in ((common, voice), (voice, common)):
-        readme = folder/'README.md'
-        text = readme.read_text()
-        section = f'''## Model repositories
+        for name in ('README.md', 'README.en.md'):
+            readme = folder/name
+            if name == 'README.md':
+                marker = '## 出典と変換内容\n'
+                section = f'''## 配布先
+
+このパッケージ：[{owner}/{folder.name}](https://huggingface.co/{owner}/{folder.name})。
+併せて必要なパッケージ：[{owner}/{companion.name}](https://huggingface.co/{owner}/{companion.name})。
+`.mlpackage`を含めた全ファイルを、フォルダ構成のまま取得してください。
+再現可能な取得には固定コミットを指定します。
+Privateの場合は認証付きのHugging Faceクライアントで取得し、サンプルでローカルフォルダを選びます。
+サンプルのHTTPS取得はPublic向けで、アクセストークンの入力機能はありません。
+
+'''
+            else:
+                marker = '## Attribution and changes\n'
+                section = f'''## Model repositories
 
 This package: [{owner}/{folder.name}](https://huggingface.co/{owner}/{folder.name}).
 Required companion: [{owner}/{companion.name}](https://huggingface.co/{owner}/{companion.name}).
 Download the complete repository contents, preserving all `.mlpackage` folders.
 Use a pinned commit revision for reproducible downloads.
 Private repositories require an authenticated Hugging Face client; download them
-to a local folder and select that folder in the sample. The sample's HTTPS
-manifest downloader uses public repositories and does not accept access tokens.
+locally and select that folder. The sample's HTTPS downloader does not accept tokens.
 
 '''
-        text = text.replace('## Attribution and changes\n', section+'## Attribution and changes\n', 1)
-        readme.write_text(text)
+            text = readme.read_text()
+            if marker not in text:
+                raise ValueError(f'Model card is missing its attribution section: {readme}')
+            readme.write_text(text.replace(marker, section+marker, 1))
+
 
 def link_source_cards(common, voice, source_url):
-    """Link the separately distributed code without changing any model weights."""
+    """Link separately distributed code without changing model weights."""
     parsed = urlparse(source_url)
     if parsed.scheme != 'https' or not parsed.netloc or any(c.isspace() for c in source_url):
         raise ValueError('Source URL must be an HTTPS repository or release URL')
-    marker = '\n## SDK, sample apps and converter\n'
     for folder in (common, voice):
-        readme = folder/'README.md'
-        text = readme.read_text().partition(marker)[0].rstrip()
-        readme.write_text(text+marker+f'''
+        for name in ('README.md', 'README.en.md'):
+            readme = folder/name
+            if name == 'README.md':
+                marker = '\n\n## SDK・サンプル・変換ツール\n'
+                section = f'''
+[SBV2 Core MLのソースと日本語ドキュメント]({source_url})に、Swift SDK、
+iPhone／Macサンプル、AIVM／Safetensorsからの声モデル変換ツールを含めています。
+導入方法はリポジトリのクイックスタートとSDKガイドを参照してください。
+コードはAGPL-3.0、モデル・辞書の条件は上記のとおりです。
+'''
+            else:
+                marker = '\n\n## SDK, sample apps and converter\n'
+                section = f'''
 [SBV2 Core ML source and documentation]({source_url}) includes the Swift SDK,
-iPhone/Mac sample apps, and AIVM/Safetensors voice conversion tools.
-Follow the repository's Quick Start and SDK guide to use these models.
+iPhone/Mac sample apps and AIVM/Safetensors voice conversion tools.
+The main documentation is Japanese, with an English README as a supplement.
 The code is AGPL-3.0; model and dictionary licenses are listed above.
-''')
+'''
+            readme.write_text(readme.read_text().partition(marker)[0].rstrip()+marker+section)
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
@@ -112,94 +145,7 @@ def main():
         'inputs':{p.name:sha(p) for p in checkpoint.iterdir() if p.is_file()}},
         'dictionary':dictionary_source,
         'conversion':'FP32 prefix.0 and group.1-23-conv, EnumeratedShapes 64/128/256; no quantization'})
-    (common/'README.md').write_text('''---
-license: cc-by-sa-4.0
-language: ja
-tags: [coreml, style-bert-vits2]
-base_model: ku-nlp/deberta-v2-large-japanese-char-wwm
----
-# SBV2 Core ML shared Japanese resources
-
-Shared BERT for the SBV2CoreML Swift library, iOS 18+ / macOS 15+ Apple Silicon.
-Download once and reuse across compatible JP-Extra voices. This package also
-contains the Open JTalk 1.11 UTF-8 dictionary under its separate BSD notices.
-
-## Attribution and changes
-
-BERT: Kyoto University NLP group, [original model](https://huggingface.co/ku-nlp/deberta-v2-large-japanese-char-wwm),
-revision `547b0e8b044fba3f9b84d0ab9f990440bd130c8b`. Converted to two FP32 Core ML
-ML Programs with fixed candidate lengths 64/128/256. No retraining or quantization.
-Original and converted BERT: CC BY-SA 4.0, see LICENSE.md.
-Dictionary: Open JTalk / NAIST / UniDic contributors, see dictionary/COPYING.
-These are unofficial conversions, without endorsement by the original authors.
-
-## Usage
-
-Pass `bert/` and `dictionary/` to `ModelPaths`; obtain a voice separately.
-The sample app can import this entire folder as BERT and find the dictionary.
-It can also download from the HTTPS URL of `download.json` at a pinned revision.
-`checksums.json` records every distributed asset. Model compilation happens locally
-on first use; compiled caches are not part of this upload.
-
-Inference is offline. The SBV2CoreML application code has its own AGPL-3.0 license.
-See the accompanying source release for setup and performance measurements.
-''')
-    (voice/'README.md').write_text('''---
-license: cc-by-sa-4.0
-language: ja
-pipeline_tag: text-to-speech
-tags: [coreml, style-bert-vits2, jp-extra]
-base_model: litagin/style_bert_vits2_jvnv
----
-# JVNV F1 JP-Extra for Core ML
-
-One Japanese voice for the SBV2CoreML Swift library, iOS 18+ / macOS 15+ Apple Silicon.
-Common BERT and an Open JTalk dictionary are required separately.
-
-## Attribution and changes
-
-Original model: litagin, [Style-Bert-VITS2 JVNV](https://huggingface.co/litagin/style_bert_vits2_jvnv),
-`jvnv-F1-jp/jvnv-F1-jp_e160_s14000.safetensors`, revision
-`205830ca1d49e666ddfbf2a755f0108e9cade4dd`. Trained on the
-[JVNV corpus](https://sites.google.com/site/shinnosuketakamichi/research-topics/jvnv_corpus).
-The original and this converted model are provided under CC BY-SA 4.0 (LICENSE.md).
-This is an unofficial conversion, without endorsement by the original creators.
-
-Converted from the original weights into Core ML encoder/DP, SDP, full-sentence
-Flow and Decoder functions. A multifunction package shares identical weights
-across shapes. There is no retraining or integer quantization. Fast decoder
-functions use mixed FP32/FP16 precision; an FP32 reference decoder is retained.
-This conversion is not bit-identical to the original PyTorch waveform.
-
-## Usage and limits
-
-Pass this folder as the voice in `ModelPaths`. Available styles are Neutral,
-Angry, Disgust, Fear, Happy, Sad and Surprise; speaker ID is 0. Output is mono
-44.1 kHz. Sentence segmentation and model capacity limits are handled by the
-Swift library. Only compatible Japanese JP-Extra models are supported.
-
-The sample can import this folder, or download `download.json` from a pinned
-Hugging Face revision. All files have hashes. It compiles the model on first use.
-
-## Validation
-
-`waveform_validation.json` compares the FP32 full neural chain with PyTorch on
-fixed synthetic inputs. `decoder_validation.json` reports FP32 and mixed precision
-errors separately. `compaction_report.json` checks exact equality before/after
-multifunction packaging. These tests do not establish identical voice quality
-for every sentence. See the source release's verification report for native
-device measurements and their scope; RTF 0.1 is not a universal guarantee.
-
-The 2026-10-04 review of 0.1.0-dev1 covered eleven natural-text cases including
-all seven styles. Whole-case SNR against the original FP32 voice was 46.05-47.01 dB,
-with identical phoneme durations and sample counts; frontend/BERT features and noise
-were shared for that comparison. The user listened through the comparison set and
-judged it acceptable, while reporting extremely rare noise. The affected case and
-original/Core ML variant were not identified. This is not a finding of zero noise.
-See the source release's verification report for the complete scope and results.
-
-The code and weights have separate licenses. The source release is AGPL-3.0.
-''')
+    write_model_cards(common, voice)
     if args.hf_owner:
         link_huggingface_cards(common,voice,args.hf_owner)
     if args.source_url:

@@ -163,7 +163,7 @@ Generated comparison WAVs are retained locally with that verdict.
 ## Before a stable public release
 
 The GitHub/Hugging Face repositories, code tag, model-card source links and immutable
-model download links are now selected. The repositories remain private; all 41 hosted
+model download links are now selected. The repositories remain private; all 43 hosted
 model files and authenticated manifest downloads were verified. See the
 [release guide](releasing.md) and [upload report](verification/huggingface-upload-20261004.json).
 

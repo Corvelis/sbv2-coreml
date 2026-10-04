@@ -14,16 +14,16 @@
 | Hugging Face・声 | JVNV F1 JP-Extra 1種類、同じ付属情報 | owner／repo、コミット版、download.json URL |
 
 Hugging Faceには2026-10-04にPrivate設定でアップロード済みです。
-全41ファイルのサイズ、LFS SHA-256／Git blob、認証付きの固定版マニフェスト取得を確認しました。
+全43ファイルのサイズ、LFS SHA-256／Git blob、認証付きの固定版マニフェスト取得を確認しました。
 [アップロード記録](verification/huggingface-upload-20261004.json)に結果を保存しています。
 
 | モデル | リポジトリ | 固定コミット |
 |---|---|---|
-| 共通 | [AILogDev/sbv2-coreml-common](https://huggingface.co/AILogDev/sbv2-coreml-common) | `ba8c4356353a649438a3d9d18545768cc2215568` |
-| 声 | [AILogDev/sbv2-coreml-jvnv-f1-jp](https://huggingface.co/AILogDev/sbv2-coreml-jvnv-f1-jp) | `8f323979b7ba0b1f6e44ba2650f8b274dbf1eb2f` |
+| 共通 | [AILogDev/sbv2-coreml-common](https://huggingface.co/AILogDev/sbv2-coreml-common) | `32936e692da19a380178a73d908f0075b49010bd` |
+| 声 | [AILogDev/sbv2-coreml-jvnv-f1-jp](https://huggingface.co/AILogDev/sbv2-coreml-jvnv-f1-jp) | `85b5dce3dc8b293526df4ff1e5e1c934d9ecee73` |
 
 コードの配布先は[Corvelis/sbv2-coreml](https://github.com/Corvelis/sbv2-coreml)、
-タグは[v0.1.0-dev1](https://github.com/Corvelis/sbv2-coreml/tree/v0.1.0-dev1)です。GitHubもPrivateです。
+タグは[v0.1.0-dev2](https://github.com/Corvelis/sbv2-coreml/tree/v0.1.0-dev2)です。GitHubもPrivateです。
 モデルカードからコードのタグへリンクし、コード側から上記の固定モデル版の取得先へリンクしています。
 匿名HTTPS取得・初期状態のサンプルでの合成確認は、Public切り替え後に行います。
 
@@ -71,7 +71,7 @@ python3 scripts/prepare_release.py \
   --dictionary input/open_jtalk_dic_utf_8-1.11 \
   --bert-checkpoint input/bert-checkpoint \
   --output artifacts/huggingface --hf-owner AILogDev \
-  --source-url https://github.com/Corvelis/sbv2-coreml/tree/v0.1.0-dev1
+  --source-url https://github.com/Corvelis/sbv2-coreml/tree/v0.1.0-dev2
 ```
 
 このレシピは固定したJVNV・BERT・辞書専用で、原本のハッシュを確認します。他の声にJVNVの名前やモデルカードを付けるためには使えません。
@@ -80,6 +80,8 @@ python3 scripts/prepare_release.py \
 出力は`sbv2-coreml-common`と`sbv2-coreml-jvnv-f1-jp`です。
 `--hf-owner`は任意で、指定すると両方のモデルカードに配布先と共通／声の相互リンクを追加します。
 `--source-url`は任意で、別配布するコード版へのHTTPSリンクを両方のモデルカードに追加します。
+モデルカードは`README.md`を日本語、`README.en.md`を英語の補助版として生成します。
+テンプレートは`scripts/model-cards/`にあり、今後の準備でもこの言語構成を維持します。
 同一マシンでは不変の`.bin`重みをハードリンクして容量を節約する場合があります。リンクした重みをその場で編集しないでください。
 
 ## 3. 検聴と端末確認を行う
@@ -107,7 +109,7 @@ Macでは`SBV2_SMOKE_ROOT`に2フォルダの親、`SBV2_SMOKE_OUTPUT`に結果�
 .venv/bin/sbv2-coreml verify artifacts/huggingface/sbv2-coreml-jvnv-f1-jp
 .venv/bin/sbv2-coreml package \
   --input artifacts/huggingface/sbv2-coreml-jvnv-f1-jp \
-  --output artifacts/releases/sbv2-coreml-jvnv-f1-jp-0.1.0-dev1.tar.gz
+  --output artifacts/releases/sbv2-coreml-jvnv-f1-jp-0.1.0-dev2.tar.gz
 ```
 
 アーカイブは新しい名前で作ります。出力済みの同名ファイルを上書きしません。

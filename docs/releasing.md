@@ -10,14 +10,14 @@ Both model repositories were uploaded on 2026-10-04 and remain private:
 
 | Repository | Pinned revision |
 |---|---|
-| [AILogDev/sbv2-coreml-common](https://huggingface.co/AILogDev/sbv2-coreml-common) | `ba8c4356353a649438a3d9d18545768cc2215568` |
-| [AILogDev/sbv2-coreml-jvnv-f1-jp](https://huggingface.co/AILogDev/sbv2-coreml-jvnv-f1-jp) | `8f323979b7ba0b1f6e44ba2650f8b274dbf1eb2f` |
+| [AILogDev/sbv2-coreml-common](https://huggingface.co/AILogDev/sbv2-coreml-common) | `32936e692da19a380178a73d908f0075b49010bd` |
+| [AILogDev/sbv2-coreml-jvnv-f1-jp](https://huggingface.co/AILogDev/sbv2-coreml-jvnv-f1-jp) | `85b5dce3dc8b293526df4ff1e5e1c934d9ecee73` |
 
-All 41 files matched their local sizes and LFS SHA-256 or Git blob IDs; authenticated
+All 43 files matched their local sizes and LFS SHA-256 or Git blob IDs; authenticated
 HTTPS fetches of both pinned `download.json` manifests passed. See the
 [upload record](verification/huggingface-upload-20261004.json).
 The source repository is [Corvelis/sbv2-coreml](https://github.com/Corvelis/sbv2-coreml),
-tag [v0.1.0-dev1](https://github.com/Corvelis/sbv2-coreml/tree/v0.1.0-dev1), also private.
+tag [v0.1.0-dev2](https://github.com/Corvelis/sbv2-coreml/tree/v0.1.0-dev2), also private.
 Both model cards link to this code tag. Anonymous sample installation after switching
 the repositories to public remains pending.
 
@@ -45,7 +45,7 @@ Then run:
 python3 scripts/prepare_release.py --bert /path/to/bert --voice /path/to/jvnv-f1-jp \
   --dictionary /path/to/open_jtalk_dic_utf_8-1.11 --bert-checkpoint /path/to/bert-checkpoint \
   --output artifacts/huggingface --hf-owner AILogDev \
-  --source-url https://github.com/Corvelis/sbv2-coreml/tree/v0.1.0-dev1
+  --source-url https://github.com/Corvelis/sbv2-coreml/tree/v0.1.0-dev2
 ```
 
 This release recipe is specifically for the named JVNV sample and pinned common BERT;

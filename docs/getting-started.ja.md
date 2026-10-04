@@ -8,11 +8,11 @@
 
 必要なのはソース一式、共通モデル、声モデルの3つです。ソースGit／ZIPには大きなモデルファイルを含めていません。
 
-ソースは[Corvelis/sbv2-coreml・v0.1.0-dev1](https://github.com/Corvelis/sbv2-coreml/tree/v0.1.0-dev1)から取得します。
+ソースは[Corvelis/sbv2-coreml・v0.1.0-dev2](https://github.com/Corvelis/sbv2-coreml/tree/v0.1.0-dev2)から取得します。
 現在はPrivateなので、アクセス権のあるGitHubアカウントで取得してください。
 
 ```sh
-git clone --branch v0.1.0-dev1 https://github.com/Corvelis/sbv2-coreml.git
+git clone --branch v0.1.0-dev2 https://github.com/Corvelis/sbv2-coreml.git
 cd sbv2-coreml
 ```
 
@@ -27,10 +27,10 @@ cd sbv2-coreml
 ```sh
 hf auth login
 hf download AILogDev/sbv2-coreml-common \
-  --revision ba8c4356353a649438a3d9d18545768cc2215568 \
+  --revision 32936e692da19a380178a73d908f0075b49010bd \
   --local-dir models/sbv2-coreml-common
 hf download AILogDev/sbv2-coreml-jvnv-f1-jp \
-  --revision 8f323979b7ba0b1f6e44ba2650f8b274dbf1eb2f \
+  --revision 85b5dce3dc8b293526df4ff1e5e1c934d9ecee73 \
   --local-dir models/sbv2-coreml-jvnv-f1-jp
 ```
 
@@ -46,16 +46,16 @@ sbv2-coreml/                     ← Package.swiftがあるフォルダ
   Package.swift
   Examples/
   artifacts/releases/
-    sbv2-coreml-common-0.1.0-dev1.tar.gz
-    sbv2-coreml-jvnv-f1-jp-0.1.0-dev1.tar.gz
+    sbv2-coreml-common-0.1.0-dev2.tar.gz
+    sbv2-coreml-jvnv-f1-jp-0.1.0-dev2.tar.gz
 ```
 
 ターミナルで`Package.swift`のあるフォルダを開き、展開します。`models/`は新規、または空の状態で始めてください。
 
 ```sh
 mkdir -p models
-tar -xzf artifacts/releases/sbv2-coreml-common-0.1.0-dev1.tar.gz -C models
-tar -xzf artifacts/releases/sbv2-coreml-jvnv-f1-jp-0.1.0-dev1.tar.gz -C models
+tar -xzf artifacts/releases/sbv2-coreml-common-0.1.0-dev2.tar.gz -C models
+tar -xzf artifacts/releases/sbv2-coreml-jvnv-f1-jp-0.1.0-dev2.tar.gz -C models
 ```
 
 Finderで展開しても構いません。最終的に次の配置になれば準備完了です。
@@ -134,8 +134,8 @@ Hugging Faceへ公開した各モデルの`download.json`のURLを、モデル�
 固定版のURLは次のとおりです。
 
 ```text
-https://huggingface.co/AILogDev/sbv2-coreml-common/resolve/ba8c4356353a649438a3d9d18545768cc2215568/download.json
-https://huggingface.co/AILogDev/sbv2-coreml-jvnv-f1-jp/resolve/8f323979b7ba0b1f6e44ba2650f8b274dbf1eb2f/download.json
+https://huggingface.co/AILogDev/sbv2-coreml-common/resolve/32936e692da19a380178a73d908f0075b49010bd/download.json
+https://huggingface.co/AILogDev/sbv2-coreml-jvnv-f1-jp/resolve/85b5dce3dc8b293526df4ff1e5e1c934d9ecee73/download.json
 ```
 
 サンプルにはHugging Face認証機能がありません。Privateの間は手順1のCLIで取得したフォルダを選びます。

@@ -29,7 +29,9 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--swift', action='store_true', help='Build SDK and type-check Swift code blocks (macOS/Xcode)')
     args = parser.parse_args()
-    pages = [ROOT/'README.md', ROOT/'THIRD_PARTY_NOTICES.md', *sorted((ROOT/'docs').glob('*.md'))]
+    pages = [*sorted(ROOT.glob('README*.md')), *sorted(ROOT.glob('THIRD_PARTY_NOTICES*.md')),
+             *sorted((ROOT/'docs').glob('*.md')), ROOT/'Examples/Apple/ICON.md',
+             *sorted((ROOT/'scripts/model-cards').rglob('*.md'))]
     missing, snippets = [], []
     link_count = 0
     for page in pages:

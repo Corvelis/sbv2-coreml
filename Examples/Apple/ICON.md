@@ -1,16 +1,15 @@
-# Sample app icon
+# サンプルアプリのアイコン
 
-The icon combines a speech bubble and waveform on teal, matching the sample's accent color.
-The built-in image generation tool produced the artwork. The iOS icon is opaque and square;
-the macOS variant has a rounded tile, padding and real alpha transparency.
-`sips` resizes the artwork to the required asset catalog sizes without changing its design.
+サンプルのアクセントカラーに合わせた青緑色の背景に、吹き出しと波形を組み合わせています。
+画像生成ツールで作成しました。iOS版は不透明な正方形、macOS版は角丸タイル・余白・透明な外周を持つ画像です。
+`sips`でデザインを変えず、Asset Catalogに必要な各サイズへ縮小しています。
 
-- iOS master: `Assets.xcassets/AppIcon.appiconset/AppIcon-1024.png`
-- macOS master: `Assets.xcassets/AppIconMac.appiconset/AppIconMac-1024.png`
-- Both targets include `Assets.xcassets` in their Resources phase.
-- The optional project generator preserves the app icon and accent-color settings.
+- iOSの原画像：`Assets.xcassets/AppIcon.appiconset/AppIcon-1024.png`
+- macOSの原画像：`Assets.xcassets/AppIconMac.appiconset/AppIconMac-1024.png`
+- 両方のターゲットのResourcesに`Assets.xcassets`を含めています。
+- 任意のプロジェクト再生成スクリプトでも、アイコンとアクセントカラーの設定を保持します。
 
-## Generation prompt
+## 生成時のプロンプト（再現用の英語原文）
 
 ```text
 Use case: logo-brand
@@ -23,7 +22,7 @@ Text: none.
 Constraints: exactly one icon, no lettering, no watermark, no branding from other companies, no microphone, no robot or character, no extra symbols. Opaque background, no alpha.
 ```
 
-## macOS adaptation prompt
+## macOS版への編集プロンプト（再現用の英語原文）
 
 ```text
 Use case: precise-object-edit

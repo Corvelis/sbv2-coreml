@@ -1,94 +1,64 @@
 # SBV2 Core ML
 
-Native Japanese **Style-Bert-VITS2 JP-Extra** speech synthesis for **iOS 18+** and
-**macOS 15+ on Apple Silicon**. Includes a Swift Package, iPhone/Mac example apps,
-a WAV command-line tool, and a checkpoint-to-Core-ML converter.
+**Style-Bert-VITS2 JP-Extraの日本語音声合成を、iPhoneとApple Silicon Macで使うためのSDKです。**
+Core MLで推論し、Swift SDK、iPhone／Mac用サンプルアプリ、WAV出力CLI、声モデルの変換ツールを含みます。
+アプリ内でONNX Runtime・Python・Flutterを使わずに動作します。
 
-[日本語ドキュメント](docs/README.ja.md) · [Conversion](docs/conversion.md) · [Model format](docs/model-format.md)
-· [Licenses](THIRD_PARTY_NOTICES.md) · [Release procedure](docs/releasing.md)
+**ドキュメントは日本語を基本としています。** 英語は補助資料として[English README](README.en.md)にまとめています。
 
-## Documentation
+## はじめに
 
-The complete Japanese guide includes a local-file Quick Start, SDK integration, all public
-Swift APIs, troubleshooting, conversion, model format, licensing and release instructions.
-English overview and technical notes remain below and in the linked English pages.
-
-| Task | Guide |
+| やりたいこと | 案内 |
 |---|---|
-| Run the sample from source and model archives | [Quick Start (日本語)](docs/getting-started.ja.md) |
-| Add the SDK to an Xcode app | [SDK integration (日本語)](docs/sdk-guide.ja.md) |
-| Look up methods, options and cancellation | [Swift API reference (日本語)](docs/api-reference.ja.md) |
-| Diagnose loading, latency, audio gaps and storage | [Troubleshooting (日本語)](docs/troubleshooting.ja.md) |
+| サンプルアプリで音声を出す | [クイックスタート](docs/getting-started.ja.md) |
+| 自分のXcodeアプリへSDKを組み込む | [SDK導入・実装ガイド](docs/sdk-guide.ja.md) |
+| サンプルの設定や再生操作を調べる | [サンプルアプリの使い方](docs/sample-app.ja.md) |
+| AivisHubや自作SBV2モデルの声を変換する | [モデル変換ガイド](docs/conversion.ja.md) |
+| API・モデル仕様・検証記録を調べる | [日本語ドキュメント一覧](docs/README.ja.md) |
+| 初期化失敗、遅延、音切れ、容量を調べる | [トラブルシューティング](docs/troubleshooting.ja.md) |
 
-Source: [Corvelis/sbv2-coreml](https://github.com/Corvelis/sbv2-coreml),
-tag [v0.1.0-dev1](https://github.com/Corvelis/sbv2-coreml/tree/v0.1.0-dev1).
-The source and both Hugging Face model repositories are currently private and require access.
-Obtaining source alone does not download model weights. See the
-[Quick Start](docs/getting-started.ja.md) for source and authenticated model downloads.
+## 配布物
 
-| Model package | Repository |
+SDKとモデルは別々に配布します。SDKを取得しただけではモデルはダウンロードされません。
+
+| 配布物 | 配布先 |
 |---|---|
-| Shared BERT and dictionary | [AILogDev/sbv2-coreml-common](https://huggingface.co/AILogDev/sbv2-coreml-common) |
-| JVNV F1 JP-Extra voice | [AILogDev/sbv2-coreml-jvnv-f1-jp](https://huggingface.co/AILogDev/sbv2-coreml-jvnv-f1-jp) |
+| SDK・サンプル・変換ツール・ドキュメント | [Corvelis/sbv2-coreml](https://github.com/Corvelis/sbv2-coreml)、タグ[v0.1.0-dev2](https://github.com/Corvelis/sbv2-coreml/tree/v0.1.0-dev2) |
+| 共通BERT・Open JTalk辞書 | [AILogDev/sbv2-coreml-common](https://huggingface.co/AILogDev/sbv2-coreml-common) |
+| サンプルの声：JVNV F1 JP-Extra | [AILogDev/sbv2-coreml-jvnv-f1-jp](https://huggingface.co/AILogDev/sbv2-coreml-jvnv-f1-jp) |
 
-Pinned revisions and upload verification are recorded in the [release guide](docs/releasing.md).
+現在は3リポジトリともPrivateです。アクセス権のあるアカウントで取得してください。
+モデルの固定版と取得方法は[クイックスタート](docs/getting-started.ja.md)、配布状況は[公開手順](docs/releasing.ja.md)に記載しています。
 
-## Contents
+## 対応環境と構成
 
-- **Swift runtime:** Core ML BERT, encoder/DP, SDP, Flow and waveform decoder.
-  Japanese text processing uses bundled Open JTalk source and a separately obtained dictionary.
-  No Flutter, Python or ONNX Runtime is needed in the application.
-- **Separate voices:** reuse one shared BERT/dictionary with multiple voice packages.
-- **Sample playback:** generate the complete utterance, then play one Float32 buffer. Replay and cancellation are included.
-- **Conversion:** input an AivisHub URL, one AIVM, or a Safetensors checkpoint with config/style vectors.
-  The public conversion path exports directly from PyTorch without an intermediate ONNX file.
-- **Distribution:** model checksums, provenance, license preservation and local HF upload staging.
+- iPhone：iOS 18以上。Mac：macOS 15以上のApple Silicon。
+- モデル変換：Apple Silicon MacとPython 3.11。
+- モデル：文書化した構造の日本語JP-Extra、44.1 kHz、hop 512、BERT特徴1024次元、スタイル256次元。
+- 推論：BERT、Encoder／DP、SDP、Flow、波形DecoderをCore MLで実行します。日本語の読み・アクセント処理にはOpen JTalkを使います。
+- 声の追加：共通BERTと辞書を使い回し、互換性のある声モデルを別フォルダで保持します。
 
-This is a pre-release source distribution. See [verification](docs/verification.md) for the
-tested models, device measurements and remaining release checks. The sample voice is JVNV F1 JP-Extra;
-it requires the shared BERT and dictionary. Anonymous HTTPS installation is pending public visibility.
+通常版SBV2、多言語版、任意の派生構造、ONNX／AIVMXだけを入力した変換は対象外です。
+モデル容量の上限により、長い文章を追加で分割することがあります。[モデル仕様](docs/model-format.ja.md)を参照してください。
 
-## Run on a Mac
+## XcodeへSDKを追加する
 
-With Xcode installed, and the two model folders obtained or prepared:
+1. **File → Add Package Dependencies**で、次のURLを指定します。
+2. **Exact Version: 0.1.0-dev2**を選びます。
+3. アプリのターゲットへ **SBV2CoreML** を追加します。
 
-```sh
-swift run -c release sbv2-say \
-  /path/to/sbv2-coreml-common/bert \
-  /path/to/sbv2-coreml-jvnv-f1-jp \
-  /path/to/sbv2-coreml-common/dictionary \
-  output.wav "こんにちは。今日はいい天気ですね。"
+```text
+https://github.com/Corvelis/sbv2-coreml.git
 ```
 
-The CLI optionally accepts `STYLE SPEAKER_ID` after the text. Models compile on first use.
-Allow extra time and disk space for the initial compilation. Retain the resulting caches for faster reopening.
-
-## iPhone / Mac apps
-
-Open `Examples/Apple/SBV2Demo.xcodeproj`:
-
-1. Choose `SBV2Demo-iOS` or `SBV2Demo-macOS`.
-2. For iPhone, select your signing team and a unique bundle identifier.
-3. Open **モデル設定** and choose **共通モデル** and **声モデル**. The dictionary is detected automatically.
-4. Press **モデルを準備**, then **生成して再生**. Playback starts after the complete utterance has been generated.
-
-The [sample app guide (Japanese)](docs/sample-app.ja.md) explains each control, styles, replay, RTF and voice switching.
-
-For public repositories, alternatively enter an HTTPS URL for a release's `download.json`. Each file is downloaded and
-verified before installation. Copying the two model folders into the iOS app's Documents folder
-also works. The app's speech synthesis works offline once resources are present.
-
-## Use in Swift
-
-In Xcode, add `https://github.com/Corvelis/sbv2-coreml.git` as a package dependency,
-choose **Exact Version: 0.1.0-dev1**, and add the **SBV2CoreML** product to your app.
-The private repository requires a GitHub account with access. Then import `SBV2CoreML`:
+Privateの間は、GitHubリポジトリへのアクセス権が必要です。
+以下は、準備済みのモデルから1つのWAVを生成する例です。
 
 ```swift
 import Foundation
 import SBV2CoreML
 
-// JVNV sample voice: speaker 0 and Neutral style.
+// サンプルのJVNV：話者ID 0、スタイルNeutral。
 func renderSample(paths: ModelPaths) async throws -> Data {
     let speech = SpeechSynthesizer()
     try await speech.load(paths)
@@ -100,15 +70,39 @@ func renderSample(paths: ModelPaths) async throws -> Data {
 }
 ```
 
-`ModelPaths` takes local BERT, voice and dictionary directory URLs. Keep the synthesizer
-loaded between utterances in a chat application. The function above is a single WAV example.
-The sample uses `synthesize` and `AudioPlayer` to play a complete utterance.
-The SDK also exposes an optional `stream` API for applications that need segment delivery;
-see the [API reference](docs/api-reference.ja.md).
-Read `VoiceInfo.styles`/`speakers` when choosing options: not every voice has a `Neutral` style.
-Cancellation takes effect between native inference calls; an in-flight Core ML call is allowed to finish.
+`ModelPaths`にはローカルのBERT・声・辞書のフォルダURLを渡します。
+繰り返し使うアプリでは`SpeechSynthesizer`を保持し、準備時に`load`と`warmUp`を実行します。
+各文章では`synthesize`を呼びます。[SDK導入ガイド](docs/sdk-guide.ja.md)に保存場所、停止、声の切り替え、モデル取得の実装をまとめています。
 
-## Convert a voice
+## サンプルアプリを使う
+
+`Examples/Apple/SBV2Demo.xcodeproj`をXcodeで開きます。
+
+1. `SBV2Demo-iOS`または`SBV2Demo-macOS`を選びます。iPhoneでは自分のTeamと固有のBundle Identifierを設定します。
+2. **モデル設定**で**共通モデル**と**声モデル**のフォルダを選びます。辞書は共通フォルダから自動認識します。
+3. **モデルを準備**を押し、準備完了後に文章を入力して**生成して再生**を押します。
+
+サンプルはLLMと連携せず、全文を合成してから1つのPCMバッファを再生します。
+スタイル変更、再再生、停止に対応します。操作は[サンプルアプリの使い方](docs/sample-app.ja.md)を参照してください。
+SDKには区間ごとのPCMを受け取る`stream` APIもあります。付属GUI／CLIは`synthesize`を使います。
+停止はネイティブ推論の区切りで反映されます。[APIリファレンス](docs/api-reference.ja.md)に詳しい仕様を記載しています。
+
+## MacのターミナルからWAVを作る
+
+Xcodeと2つのモデルフォルダを用意して実行します。
+
+```sh
+swift run -c release sbv2-say \
+  /path/to/sbv2-coreml-common/bert \
+  /path/to/sbv2-coreml-jvnv-f1-jp \
+  /path/to/sbv2-coreml-common/dictionary \
+  output.wav "こんにちは。今日はいい天気ですね。"
+```
+
+文章の後に`Happy 0`のようにスタイルと話者IDを指定することもできます。
+初回にはCore MLのコンパイルが発生します。生成されたキャッシュを残すと次回の準備時間を短縮できます。
+
+## 自分の声モデルを変換する
 
 ```sh
 python3.11 -m venv .venv
@@ -117,21 +111,20 @@ python3.11 -m venv .venv
 .venv/bin/sbv2-coreml convert --aivm voice.aivm --output models/my-voice
 ```
 
-The pinned upstream source is acquired automatically. [More inputs and validation details](docs/conversion.md).
-Conversion requires macOS/Python 3.11; the runtime itself only requires the Apple SDK and models.
+AivisHubのURL、AIVM、またはSafetensorsと設定・スタイルベクトルから直接Core MLへ変換します。
+必要な元のSBV2ソースは固定コミットから取得します。詳しい入力方法と検証手順は[モデル変換ガイド](docs/conversion.ja.md)を参照してください。
 
-## Scope and licenses
+## 検証状況とライセンス
 
-The supported profile is Japanese JP-Extra, 44.1 kHz, hop 512, 1024-dimensional BERT,
-256-dimensional styles, and the documented decoder architecture. Arbitrary SBV2 forks and
-AIVMX-only downloads are not supported. Internal capacity limits can require additional text splits.
+これはプレリリースです。サンプルのJVNV、iPhone 17 Pro、Apple Silicon Macで確認した条件を[検証記録](docs/verification.ja.md)にまとめています。
+全機種・全文章・全モデルでのRTF 0.1や、知覚的な音質の完全一致を保証するものではありません。
+Public切り替え後の、サンプルからの匿名HTTPS取得・合成・再起動後の再利用確認が残っています。
 
-Code is distributed under **AGPL-3.0**, with retained notices for third-party components.
-The converted JVNV voice and common DeBERTa carry **CC BY-SA 4.0**; the dictionary has separate BSD notices.
-Other voices retain their own terms. See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
-This repository does not grant permission to use third-party character artwork or trademarks.
+コードは**AGPL-3.0**、変換済みJVNVと共通BERTは**CC BY-SA 4.0**です。
+辞書は別のBSD系条件、追加する声はそれぞれの原本の条件に従います。
+[ライセンスと出典](THIRD_PARTY_NOTICES.md)、[日本語ライセンスガイド](docs/licenses.ja.md)を参照してください。
 
-## Development
+## 開発時の確認
 
 ```sh
 swift test
@@ -139,4 +132,4 @@ PYTHONPATH=converter .venv/bin/python -m unittest discover -s converter/tests -v
 python3 scripts/check_docs.py --swift
 ```
 
-No remote repository, package registry or model upload is created by these commands.
+これらはローカルの検証コマンドです。モデルのアップロードなどの公開操作は[公開手順](docs/releasing.ja.md)で行います。
