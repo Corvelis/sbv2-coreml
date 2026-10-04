@@ -7,11 +7,11 @@
 
 ## 1. ソースを取得する
 
-[ReleaseのソースZIP](https://github.com/Corvelis/sbv2-coreml/releases/tag/v0.1.0-dev3)をダウンロードして展開します。
+[ReleaseのソースZIP](https://github.com/Corvelis/sbv2-coreml/releases/tag/v0.1.0-dev4)をダウンロードして展開します。
 Gitを使う場合は次のコマンドでも取得できます。
 
 ```sh
-git clone --branch v0.1.0-dev3 https://github.com/Corvelis/sbv2-coreml.git
+git clone --branch v0.1.0-dev4 https://github.com/Corvelis/sbv2-coreml.git
 cd sbv2-coreml
 ```
 

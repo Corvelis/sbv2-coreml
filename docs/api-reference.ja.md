@@ -2,7 +2,7 @@
 
 [ドキュメント一覧](README.ja.md) · [使用例](sdk-guide.ja.md)
 
-対象は`SBV2CoreML`の公開API、バージョン`0.1.0-dev3`です。
+対象は`SBV2CoreML`の公開API、バージョン`0.1.0-dev4`です。
 宣言の原本は[SpeechSynthesizer.swift](../Sources/SBV2CoreML/SpeechSynthesizer.swift)、
 [TextSegmenter.swift](../Sources/SBV2CoreML/TextSegmenter.swift)、
 [ModelDownloader.swift](../Sources/SBV2CoreML/ModelDownloader.swift)です。
@@ -58,7 +58,7 @@ URLはローカル用です。BERTのキャッシュ作成先にも書き込め�
 |---|---|---|
 | `load(_ paths: ModelPaths) async throws` | `VoiceInfo` | 既存の合成を無効化し、BERT・声・辞書を準備。既存モデルを再初期化する |
 | `warmUp(options: SpeechOptions = .init()) async throws` | `Void` | 「こんにちは。」を実際に合成して破棄。モデル読み込み後に呼ぶ |
-| `synthesize(_ text: String, options: SpeechOptions = .init()) async throws` | `SpeechChunk` | 内部で区間へ分割し、全区間のPCMを連結して返す |
+| `synthesize(_ text: String, options: SpeechOptions = .init()) async throws` | `SpeechChunk` | 隣接する文をまとめて合成し、必要な場合に分割。全文のPCMを返す |
 | `stream(_ text: String, options: SpeechOptions = .init(), segmenter: TextSegmenter = .init())` | `SpeechStream` | 区間単位で取得するシーケンスを作る。作成だけでは推論しない |
 | `cancel()` | `Void` | このインスタンスの既存ストリーム／合成を無効化する。モデルは保持する |
 | `unload() async throws` | `Void` | 既存合成を無効化し、インスタンスのBERT・声モデルを解放する |
@@ -102,7 +102,8 @@ URLはローカル用です。BERTのキャッシュ作成先にも書き込め�
 - 境界がなければ`maximumCharacters`で強制分割。数え方はSwiftの`Character`単位です。
 - 区間の前後の空白・改行を除去。空区間を除外し、句読点だけの末尾区間は前の区間へ付けます。
 
-`synthesize`では既定値を使います。設定を変更する場合は`stream(..., segmenter: ...)`を使います。
+`synthesize`は隣接する文を250文字以内でまとめ、モデル容量を超えた場合に追加分割します。
+区間ごとに受け取る場合や分割設定を変更する場合は`stream(..., segmenter: ...)`を使います。
 250文字はモデルが一度に処理できる音素数とは異なります。128音素／512フレームなどの制約による再分割は別に発生します。
 
 ## SpeechChunk

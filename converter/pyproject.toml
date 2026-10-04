@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "sbv2-coreml"
-version = "0.1.0.dev3"
+version = "0.1.0.dev4"
 description = "日本語Style-Bert-VITS2 JP-Extraの声モデルを、iPhone・Mac用のCore MLへ変換するツール"
 requires-python = ">=3.11,<3.12"
 license = "AGPL-3.0-only"

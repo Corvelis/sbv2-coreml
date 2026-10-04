@@ -39,6 +39,7 @@ project.root_object.package_references << package
   scheme = Xcodeproj::XCScheme.new
   scheme.add_build_target(target)
   scheme.set_launch_target(target)
+  scheme.launch_action.build_configuration = 'Release'
   scheme.save_as(project.path, name, true)
 end
 project.save

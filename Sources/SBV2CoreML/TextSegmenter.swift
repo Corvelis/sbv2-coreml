@@ -21,6 +21,28 @@ public struct TextSegmenter: Sendable {
         append(current, to: &result)
         return result
     }
+    /// Full-buffer synthesis can share one inference across adjacent sentences.
+    /// Capacity fallback still prefers punctuation if a batch exceeds the model limits.
+    func batches(_ text: String) -> [String] {
+        var sentences: [String] = [], sentence = ""
+        for character in text {
+            sentence.append(character)
+            if "。！？!?\n".contains(character) || sentence.count >= maximumCharacters {
+                sentences.append(sentence); sentence = ""
+            }
+        }
+        if !sentence.isEmpty { sentences.append(sentence) }
+        var result: [String] = [], current = ""
+        for sentence in sentences {
+            if !current.isEmpty && current.count + sentence.count > maximumCharacters {
+                if !current.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty { result.append(current) }
+                current = ""
+            }
+            current += sentence
+        }
+        if !current.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty { result.append(current) }
+        return result
+    }
     private func append(_ text: String, to result: inout [String]) {
         let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return }

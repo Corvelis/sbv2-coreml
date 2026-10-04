@@ -22,7 +22,7 @@ Style-Bert-VITS2 JP-ExtraをiPhone／Apple Silicon Macで使うためのSDK、�
 
 | 配布物 | 内容 | 入手・配置 |
 |---|---|---|
-| SDKとサンプル | Swift Package、iPhone／Macアプリ、WAV出力CLI、Python変換ツール | [Corvelis/sbv2-coreml・v0.1.0-dev3](https://github.com/Corvelis/sbv2-coreml/tree/v0.1.0-dev3)／ソースZIP |
+| SDKとサンプル | Swift Package、iPhone／Macアプリ、WAV出力CLI、Python変換ツール | [Corvelis/sbv2-coreml・v0.1.0-dev4](https://github.com/Corvelis/sbv2-coreml/tree/v0.1.0-dev4)／ソースZIP |
 | 共通モデル | 日本語BERTとOpen JTalk辞書、約1.52 GB | [AILogDev/sbv2-coreml-common](https://huggingface.co/AILogDev/sbv2-coreml-common) |
 | サンプルの声 | JVNV F1 JP-Extra、約294 MB | [AILogDev/sbv2-coreml-jvnv-f1-jp](https://huggingface.co/AILogDev/sbv2-coreml-jvnv-f1-jp) |
 

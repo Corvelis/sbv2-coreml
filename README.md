@@ -25,7 +25,7 @@ Core MLで推論し、iPhone／Mac用サンプルアプリ、WAV出力CLI、声�
 
 | 配布物 | 入手先 |
 |---|---|
-| SDK・サンプルアプリ・変換ツール | [GitHub Releases](https://github.com/Corvelis/sbv2-coreml/releases/tag/v0.1.0-dev3) |
+| SDK・サンプルアプリ・変換ツール | [GitHub Releases](https://github.com/Corvelis/sbv2-coreml/releases/tag/v0.1.0-dev4) |
 | 共通BERT・Open JTalk辞書（約1.52 GB） | [AILogDev/sbv2-coreml-common](https://huggingface.co/AILogDev/sbv2-coreml-common) |
 | JVNV F1 JP-Extraの声モデル（約294 MB） | [AILogDev/sbv2-coreml-jvnv-f1-jp](https://huggingface.co/AILogDev/sbv2-coreml-jvnv-f1-jp) |
 
@@ -35,7 +35,7 @@ SDK・ソースZIPにモデルの重みは含まれていません。取得方�
 ## XcodeへSDKを追加する
 
 1. **File → Add Package Dependencies**で、次のURLを指定します。
-2. **Exact Version: 0.1.0-dev3**を選びます。
+2. **Exact Version: 0.1.0-dev4**を選びます。
 3. アプリのターゲットへ **SBV2CoreML** を追加します。
 
 ```text

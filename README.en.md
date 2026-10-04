@@ -14,7 +14,7 @@ Inference runs on-device through Core ML. Python and ONNX Runtime are not requir
   and the [JVNV voice](https://huggingface.co/AILogDev/sbv2-coreml-jvnv-f1-jp).
   Model weights are downloaded separately from the source/SDK.
 
-[Source downloads](https://github.com/Corvelis/sbv2-coreml/releases/tag/v0.1.0-dev3) ·
+[Source downloads](https://github.com/Corvelis/sbv2-coreml/releases/tag/v0.1.0-dev4) ·
 [Quick Start](docs/getting-started.ja.md) · [SDK guide](docs/sdk-guide.ja.md) ·
 [Sample app](docs/sample-app.ja.md) · [API reference](docs/api-reference.ja.md) ·
 [Troubleshooting](docs/troubleshooting.ja.md)
@@ -22,7 +22,7 @@ Inference runs on-device through Core ML. Python and ONNX Runtime are not requir
 ## Add the SDK
 
 In Xcode, select **File → Add Package Dependencies**, enter
-`https://github.com/Corvelis/sbv2-coreml.git`, choose **Exact Version: 0.1.0-dev3**,
+`https://github.com/Corvelis/sbv2-coreml.git`, choose **Exact Version: 0.1.0-dev4**,
 and add the **SBV2CoreML** product to your app.
 
 ```swift

@@ -79,6 +79,7 @@ Webページや圧縮アーカイブのURLはこの欄で使えません。取�
 [SBV2Demo.swift](../Examples/Apple/SBV2Demo.swift)の `DemoState` がモデル準備・合成・状態表示を管理し、
 `AudioPlayer` が44.1 kHz・モノラルのFloat32音声を1つのバッファで再生します。
 サンプルは`synthesize`で全文を生成してから再生します。
+隣接する文はモデル容量に収まる範囲でまとめて合成し、推論回数を減らします。
 長文はSDK内部でモデル容量に合わせて分割される場合がありますが、全区間が揃ってから再生します。
 
 このGUIにはWAV保存ボタンはありません。保存したい場合は[WAV出力CLI](getting-started.ja.md)か

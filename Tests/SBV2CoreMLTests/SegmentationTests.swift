@@ -35,6 +35,22 @@ final class SegmentationTests: XCTestCase {
         XCTAssertEqual(split.count, 2)
         XCTAssertEqual(split.joined(), text)
     }
+    func testFullSynthesisBatchesSentencesAndCommas() {
+        let text = "まず、こんにちは。その後、散歩します。"
+        XCTAssertEqual(TextSegmenter().batches(text), [text])
+        XCTAssertEqual(TextSegmenter().batches("「こんにちは。」\n次です。"), ["「こんにちは。」\n次です。"])
+        XCTAssertEqual(TextSegmenter().batches(" \n "), [])
+        XCTAssertEqual(TextSegmenter().split(text), ["まず、", "こんにちは。", "その後、散歩します。"])
+    }
+    func testFullSynthesisBatchesRespectSentenceBoundaryAndLimit() {
+        let text = "最初の文。次の文章です。最後です。"
+        let pieces = TextSegmenter(maximumCharacters: 13).batches(text)
+        XCTAssertEqual(pieces, ["最初の文。次の文章です。", "最後です。"])
+        XCTAssertEqual(pieces.joined(), text)
+        XCTAssertTrue(pieces.allSatisfy { $0.count <= 13 })
+        let forced = String(repeating: "あ", count: 501)
+        XCTAssertEqual(TextSegmenter().batches(forced).map(\.count), [250, 250, 1])
+    }
     func testWavClamping() throws {
         let values: [Float] = [-2, 0, 2]
         let chunk = SpeechChunk(text: "", pcm: values.withUnsafeBufferPointer { Data(buffer: $0) },

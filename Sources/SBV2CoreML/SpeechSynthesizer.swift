@@ -133,7 +133,8 @@ public final class SpeechSynthesizer: @unchecked Sendable {
     }
     public func synthesize(_ text: String, options: SpeechOptions = .init()) async throws -> SpeechChunk {
         var pcm = Data(), seconds = 0.0, split = false
-        for try await chunk in stream(text, options: options) {
+        let batches = SpeechStream(engine: self, segments: TextSegmenter().batches(text), options: options, generation: token())
+        for try await chunk in batches {
             pcm.append(chunk.pcm); seconds += chunk.synthesisSeconds; split = split || chunk.capacitySplit
         }
         return SpeechChunk(text: text, pcm: pcm, sampleRate: 44100, synthesisSeconds: seconds, capacitySplit: split)
