@@ -22,8 +22,8 @@ Style-Bert-VITS2 JP-ExtraをiPhone／Apple Silicon Macで使うためのSDK、�
 | 配布物 | 内容 | 入手・配置 |
 |---|---|---|
 | SDKとサンプル | Swift Package、iPhone／Macアプリ、WAV出力CLI、Python変換ツール | このリポジトリ／ソースZIP |
-| 共通モデル | 日本語BERTとOpen JTalk辞書、約1.52 GB | `sbv2-coreml-common` |
-| サンプルの声 | JVNV F1 JP-Extra、約294 MB | `sbv2-coreml-jvnv-f1-jp` |
+| 共通モデル | 日本語BERTとOpen JTalk辞書、約1.52 GB | [AILogDev/sbv2-coreml-common](https://huggingface.co/AILogDev/sbv2-coreml-common) |
+| サンプルの声 | JVNV F1 JP-Extra、約294 MB | [AILogDev/sbv2-coreml-jvnv-f1-jp](https://huggingface.co/AILogDev/sbv2-coreml-jvnv-f1-jp) |
 
 容量は展開後の配布ファイルの概算です。ダウンロード一時ファイルとCore MLのコンパイルキャッシュは別途必要です。
 互換性のある声パッケージを追加する際、共通BERT・辞書の再ダウンロードは不要です。
@@ -37,9 +37,11 @@ Style-Bert-VITS2 JP-ExtraをiPhone／Apple Silicon Macで使うためのSDK、�
 
 ## 公開状況
 
-現在は公開準備版です。GitHub／Hugging Faceの公開URLは未確定で、架空のダウンロードリンクは掲載していません。
-[クイックスタート](getting-started.ja.md)は、入手したソースとモデルをローカルから使う手順です。
-公開後に埋める項目と確認手順は[公開手順](releasing.ja.md)に集約しています。
+2026-10-04にHugging Faceの2つのPrivateリポジトリへアップロードしました。全41ファイルの
+リモートのハッシュと認証付きマニフェスト取得を確認済みです。
+[クイックスタート](getting-started.ja.md)に認証付きの取得とローカルフォルダからの使用方法を記載しています。
+GitHubのソース公開・タグ、モデルカードからそのタグへのリンク、Public切り替え後のサンプルの
+匿名HTTPS取得確認が残っています。固定モデル版と記録は[公開手順](releasing.ja.md)を参照してください。
 
 コードはAGPL-3.0、JVNVと共通BERTはCC BY-SA 4.0です。辞書・他の声にはそれぞれの条件があります。
 本文の要約に加え、[ライセンス原文と第三者表記](../THIRD_PARTY_NOTICES.md)も確認してください。

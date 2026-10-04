@@ -4,6 +4,21 @@
 
 The repository prepares files locally. It never creates a remote repository or uploads weights automatically.
 
+## Current upload status
+
+Both model repositories were uploaded on 2026-10-04 and remain private:
+
+| Repository | Pinned revision |
+|---|---|
+| [AILogDev/sbv2-coreml-common](https://huggingface.co/AILogDev/sbv2-coreml-common) | `94179fe62664d979791489969b5a9d1c1b335f34` |
+| [AILogDev/sbv2-coreml-jvnv-f1-jp](https://huggingface.co/AILogDev/sbv2-coreml-jvnv-f1-jp) | `e5a48afa6244ecd5128b85496ad0afbbef37365e` |
+
+All 41 files matched their local sizes and LFS SHA-256 or Git blob IDs; authenticated
+HTTPS fetches of both pinned `download.json` manifests passed. See the
+[upload record](verification/huggingface-upload-20261004.json).
+The source GitHub repository/tag, model-card links to that tag, and anonymous sample
+installation after switching the repositories to public remain pending.
+
 ## 1. Verify the code
 
 ```sh
@@ -27,7 +42,7 @@ Then run:
 ```sh
 python3 scripts/prepare_release.py --bert /path/to/bert --voice /path/to/jvnv-f1-jp \
   --dictionary /path/to/open_jtalk_dic_utf_8-1.11 --bert-checkpoint /path/to/bert-checkpoint \
-  --output artifacts/huggingface
+  --output artifacts/huggingface --hf-owner AILogDev
 ```
 
 This release recipe is specifically for the named JVNV sample and pinned common BERT;
@@ -35,6 +50,7 @@ do not apply its model cards to another voice. It creates two local upload folde
 `sbv2-coreml-common` and `sbv2-coreml-jvnv-f1-jp`. The shared package includes the dictionary
 under its separate notices. Immutable weight files may be hard-linked locally to save space.
 Copy the folders normally when transferring to another machine; do not modify linked weights.
+The optional `--hf-owner` adds the selected publisher's model-repository and companion links.
 
 Only the files listed in `checksums.json`, plus `checksums.json`, `download.json`, and
 `.gitattributes`, are release assets. Do not upload locally generated `.mlmodelc` caches.

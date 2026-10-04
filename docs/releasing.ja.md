@@ -13,8 +13,16 @@
 | Hugging Face・共通 | BERT、辞書、モデルカード、ライセンス、ハッシュ | owner／repo、コミット版、download.json URL |
 | Hugging Face・声 | JVNV F1 JP-Extra 1種類、同じ付属情報 | owner／repo、コミット版、download.json URL |
 
-現在はこれらの公開先が未確定です。実在するURLが決まるまでは、ローカルからの利用手順を掲載します。
-公開後の変更箇所は、ルートREADME、日本語README、クイックスタート、両方のモデルカードです。
+Hugging Faceには2026-10-04にPrivate設定でアップロード済みです。
+全41ファイルのサイズ、LFS SHA-256／Git blob、認証付きの固定版マニフェスト取得を確認しました。
+[アップロード記録](verification/huggingface-upload-20261004.json)に結果を保存しています。
+
+| モデル | リポジトリ | 固定コミット |
+|---|---|---|
+| 共通 | [AILogDev/sbv2-coreml-common](https://huggingface.co/AILogDev/sbv2-coreml-common) | `94179fe62664d979791489969b5a9d1c1b335f34` |
+| 声 | [AILogDev/sbv2-coreml-jvnv-f1-jp](https://huggingface.co/AILogDev/sbv2-coreml-jvnv-f1-jp) | `e5a48afa6244ecd5128b85496ad0afbbef37365e` |
+
+GitHubの公開先・タグは未確定です。確定後は、ルートREADME、日本語README、クイックスタート、両方のモデルカードを更新します。
 モデルカードから実際のコードのタグへリンクし、コード側からモデルの固定コミットの取得先へリンクします。
 
 ## 1. コードとドキュメントを検証する
@@ -60,13 +68,14 @@ python3 scripts/prepare_release.py \
   --voice input/jvnv-f1-jp-coreml \
   --dictionary input/open_jtalk_dic_utf_8-1.11 \
   --bert-checkpoint input/bert-checkpoint \
-  --output artifacts/huggingface
+  --output artifacts/huggingface --hf-owner AILogDev
 ```
 
 このレシピは固定したJVNV・BERT・辞書専用で、原本のハッシュを確認します。他の声にJVNVの名前やモデルカードを付けるためには使えません。
 別の声を公開する場合は、その原本の許諾・出典・構造・検証結果を使い、専用のモデルカードを作成してください。
 
 出力は`sbv2-coreml-common`と`sbv2-coreml-jvnv-f1-jp`です。
+`--hf-owner`は任意で、指定すると両方のモデルカードに配布先と共通／声の相互リンクを追加します。
 同一マシンでは不変の`.bin`重みをハードリンクして容量を節約する場合があります。リンクした重みをその場で編集しないでください。
 
 ## 3. 検聴と端末確認を行う
@@ -108,7 +117,7 @@ Hugging Faceには`checksums.json`に列挙した資産と、`checksums.json`、
 ## 5. 公開と公開URLの確認
 
 1. GitHubへこの独立リポジトリを公開し、版をタグ付けする。大きなモデル、キャッシュ、原本、個人の署名情報はコミットしない。
-2. Hugging Faceへ共通資産と声をそれぞれ公開し、コードのタグへのリンク、原作者・原本・利用条件・変更内容を保持する。
+2. アップロード済みのHugging Faceの共通資産と声をPublicへ切り替え、コードのタグへのリンク、原作者・原本・利用条件・変更内容を保持する。
 3. 公開したコミットを記録し、各`download.json`を固定コミットのHTTPS URLで参照する。
 4. 初期状態のサンプルアプリで2つのマニフェストから取得し、準備・合成・再起動後の再利用を確認する。
 5. READMEとモデルカードの公開先情報を確定し、リリースノートへ確認した条件と制限を記載する。

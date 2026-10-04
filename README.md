@@ -20,8 +20,17 @@ English overview and technical notes remain below and in the linked English page
 | Look up methods, options and cancellation | [Swift API reference (日本語)](docs/api-reference.ja.md) |
 | Diagnose loading, latency, audio gaps and storage | [Troubleshooting (日本語)](docs/troubleshooting.ja.md) |
 
-Repository/model hosting URLs are not published yet. The Quick Start uses local model
-archives; obtaining source alone does not download the model weights.
+The converted models are uploaded to Hugging Face; both repositories are currently private.
+The GitHub source repository and release tag are still pending. Obtaining source alone does
+not download model weights. See the [Quick Start](docs/getting-started.ja.md) for authenticated
+model downloads and local model archives.
+
+| Model package | Repository |
+|---|---|
+| Shared BERT and dictionary | [AILogDev/sbv2-coreml-common](https://huggingface.co/AILogDev/sbv2-coreml-common) |
+| JVNV F1 JP-Extra voice | [AILogDev/sbv2-coreml-jvnv-f1-jp](https://huggingface.co/AILogDev/sbv2-coreml-jvnv-f1-jp) |
+
+Pinned revisions and upload verification are recorded in the [release guide](docs/releasing.md).
 
 ## Contents
 
@@ -36,7 +45,7 @@ archives; obtaining source alone does not download the model weights.
 
 This is a pre-release source distribution. See [verification](docs/verification.md) for the
 tested models, device measurements and remaining release checks. The sample voice is JVNV F1 JP-Extra;
-it requires the shared BERT and dictionary. Hosting URLs are chosen when publishing.
+it requires the shared BERT and dictionary. Anonymous HTTPS installation is pending public visibility.
 
 ## Run on a Mac
 
@@ -64,7 +73,7 @@ Open `Examples/Apple/SBV2Demo.xcodeproj`:
 
 The [sample app guide (Japanese)](docs/sample-app.ja.md) explains each control, styles, replay, RTF and voice switching.
 
-Alternatively enter an HTTPS URL for a release's `download.json`. Each file is downloaded and
+For public repositories, alternatively enter an HTTPS URL for a release's `download.json`. Each file is downloaded and
 verified before installation. Copying the two model folders into the iOS app's Documents folder
 also works. The app's speech synthesis works offline once resources are present.
 

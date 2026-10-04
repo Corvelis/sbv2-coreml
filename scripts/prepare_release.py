@@ -43,10 +43,32 @@ def seal(root):
     write(root/'download.json',{'formatVersion':1,'name':root.name,'files':[
         {'path':name,'sha256':sha(root/name),'bytes':(root/name).stat().st_size} for name in entries]})
 
+def link_huggingface_cards(common, voice, owner):
+    """Add companion-repository links before sealing a publisher's upload folders."""
+    if not owner or any(c not in 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_' for c in owner):
+        raise ValueError('Hugging Face owner must be a user or organization name')
+    for folder, companion in ((common, voice), (voice, common)):
+        readme = folder/'README.md'
+        text = readme.read_text()
+        section = f'''## Model repositories
+
+This package: [{owner}/{folder.name}](https://huggingface.co/{owner}/{folder.name}).
+Required companion: [{owner}/{companion.name}](https://huggingface.co/{owner}/{companion.name}).
+Download the complete repository contents, preserving all `.mlpackage` folders.
+Use a pinned commit revision for reproducible downloads.
+Private repositories require an authenticated Hugging Face client; download them
+to a local folder and select that folder in the sample. The sample's HTTPS
+manifest downloader uses public repositories and does not accept access tokens.
+
+'''
+        text = text.replace('## Attribution and changes\n', section+'## Attribution and changes\n', 1)
+        readme.write_text(text)
+
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     for name in ('bert','voice','dictionary','output'):parser.add_argument('--'+name,type=Path,required=True)
     parser.add_argument('--bert-checkpoint',type=Path,required=True)
+    parser.add_argument('--hf-owner',help='Hugging Face user or organization for companion-repository links')
     args=parser.parse_args()
     if args.output.exists():raise ValueError('Use a new output directory')
     provenance=json.loads((args.voice/'provenance.json').read_text())
@@ -160,6 +182,8 @@ See the source release's verification report for the complete scope and results.
 
 The code and weights have separate licenses. The source release is AGPL-3.0.
 ''')
+    if args.hf_owner:
+        link_huggingface_cards(common,voice,args.hf_owner)
     for path in (common,voice):
         (path/'.gitattributes').write_text('*.bin filter=lfs diff=lfs merge=lfs -text\n*.dic filter=lfs diff=lfs merge=lfs -text\n*.mlmodel filter=lfs diff=lfs merge=lfs -text\n')
         seal(path)

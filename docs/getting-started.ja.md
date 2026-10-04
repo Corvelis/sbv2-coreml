@@ -7,6 +7,28 @@
 ## 1. ソースとモデルを用意する
 
 必要なのはソース一式、共通モデル、声モデルの3つです。ソースGit／ZIPには大きなモデルファイルを含めていません。
+### Hugging Faceから取得する
+
+共通モデルは[AILogDev/sbv2-coreml-common](https://huggingface.co/AILogDev/sbv2-coreml-common)、
+声モデルは[AILogDev/sbv2-coreml-jvnv-f1-jp](https://huggingface.co/AILogDev/sbv2-coreml-jvnv-f1-jp)です。
+現在はPrivateなので、アクセス権のあるアカウントで取得してください。
+[Hugging Face公式CLI](https://huggingface.co/docs/huggingface_hub/guides/cli)をインストールし、
+`Package.swift`のあるフォルダで実行します。トークンは`hf auth login`の入力欄で扱います。
+
+```sh
+hf auth login
+hf download AILogDev/sbv2-coreml-common \
+  --revision 94179fe62664d979791489969b5a9d1c1b335f34 \
+  --local-dir models/sbv2-coreml-common
+hf download AILogDev/sbv2-coreml-jvnv-f1-jp \
+  --revision e5a48afa6244ecd5128b85496ad0afbbef37365e \
+  --local-dir models/sbv2-coreml-jvnv-f1-jp
+```
+
+取得できたら手順2へ進みます。iPhoneへ移す場合は、取得した2フォルダを丸ごとコピーします。
+
+### ローカルのモデルアーカイブから用意する場合
+
 この公開準備用の作業コピーでは、`artifacts/releases/`に次の配布ファイルがあります。
 配布ファイルを別途受け取った場合も、同じ場所に置くと以下のコマンドをそのまま使えます。
 
@@ -95,11 +117,19 @@ CLIはウォームアップを自動実行しません。表示される合成�
 サンプルの「モデルを準備」はこの待ち時間を対話前にまとめるための操作です。
 形状の異なる初回入力まで、すべて事前実行するものではありません。[実測値と条件](verification.ja.md)を参照してください。
 
-## HTTPSでの取得は公開後に使う
+## サンプルからのHTTPS取得はPublic切り替え後に使う
 
 Hugging Faceへ公開した各モデルの`download.json`のURLを、モデル設定の「URLからモデルを取得」に指定できます。
 「取得するモデル」で共通モデルと声モデルを選び、別々に取得します。
 リポジトリのWebページや`.tar.gz`のURLをこの欄に入れることはできません。
-このURL経由の動作確認は、実際の公開先が決まってから行います。
+固定版のURLは次のとおりです。
+
+```text
+https://huggingface.co/AILogDev/sbv2-coreml-common/resolve/94179fe62664d979791489969b5a9d1c1b335f34/download.json
+https://huggingface.co/AILogDev/sbv2-coreml-jvnv-f1-jp/resolve/e5a48afa6244ecd5128b85496ad0afbbef37365e/download.json
+```
+
+サンプルにはHugging Face認証機能がありません。Privateの間は手順1のCLIで取得したフォルダを選びます。
+サンプル自身による匿名HTTPS取得・取得後の合成・再起動後の再選択は、Public切り替え後に確認します。
 
 困った場合は[トラブルシューティング](troubleshooting.ja.md)へ進んでください。
