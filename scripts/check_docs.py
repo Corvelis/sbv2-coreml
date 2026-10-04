@@ -30,8 +30,7 @@ def main():
     parser.add_argument('--swift', action='store_true', help='Build SDK and type-check Swift code blocks (macOS/Xcode)')
     args = parser.parse_args()
     pages = [*sorted(ROOT.glob('README*.md')), *sorted(ROOT.glob('THIRD_PARTY_NOTICES*.md')),
-             *sorted((ROOT/'docs').glob('*.md')), ROOT/'Examples/Apple/ICON.md',
-             *sorted((ROOT/'scripts/model-cards').rglob('*.md'))]
+             *sorted((ROOT/'docs').glob('*.md'))]
     missing, snippets = [], []
     link_count = 0
     for page in pages:

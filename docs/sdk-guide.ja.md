@@ -11,11 +11,10 @@ SDK、共通モデル、声モデルは別の配布物です。Swift Packageを�
 
 1. iOSまたはmacOSのアプリプロジェクトを開く。
 2. Deployment TargetをiOS 18以上、またはmacOS 15以上にする。Macの対象はApple Siliconです。
-3. **File → Add Package Dependencies**で`https://github.com/Corvelis/sbv2-coreml.git`を指定し、**Exact Version: 0.1.0-dev2**を選ぶ。
+3. **File → Add Package Dependencies**で`https://github.com/Corvelis/sbv2-coreml.git`を指定し、**Exact Version: 0.1.0-dev3**を選ぶ。
 4. Package Product **SBV2CoreML**をアプリのターゲットへ追加する。CLI用の`sbv2-say`をリンクする必要はありません。
 5. アプリのSwiftファイルに`import SBV2CoreML`を書く。
 
-現在はPrivateなので、リポジトリへのアクセス権があるGitHubアカウントで認証してください。
 [Appleのパッケージ追加手順](https://developer.apple.com/documentation/xcode/adding-package-dependencies-to-your-app)も参照できます。
 ソースを取得済みの場合は、手順3で**Add Local**から`Package.swift`のあるフォルダを選ぶ方法も使えます。
 [Appleのローカルパッケージ追加手順](https://developer.apple.com/documentation/xcode/editing-a-package-dependency-as-a-local-package)
@@ -95,8 +94,7 @@ func writeGreetingInDocuments() async throws -> URL {
 ## 全文を生成して再生する
 
 付属[AudioPlayerとDemoState](../Examples/Apple/SBV2Demo.swift)は、`synthesize`の完了を待ち、
-生成した全文のPCMを1つのバッファとして再生します。次の区間を再生中に合成する処理や、
-再生残り2秒で補充する処理はありません。生成済み音声は再合成せず再再生できます。
+生成した全文のPCMを1つのバッファとして再生します。生成済み音声は再合成せず再再生できます。
 
 PCMはFloat32・モノラル・44.1 kHzです。サンプルはFloat32のままAVAudioEngineで再生します。
 ファイル出力用の`wav()`は16 bit PCM WAVへ変換します。
@@ -116,7 +114,7 @@ SDKには、区間ごとのPCMが必要なアプリ向けに任意で利用で�
 共通ファイルの再取得は不要ですが、現在の`load`はモデルを再初期化します。BERTをRAMへ保持したまま声だけ差し替えるAPIではありません。
 同一インスタンスで`load`、合成、`unload`を並行して開始せず、アプリ側で順番を管理してください。
 
-## 公開後のモデルダウンロード
+## モデルをダウンロードする
 
 ```swift
 import Foundation
@@ -134,7 +132,6 @@ func downloadModel(manifestURL: URL, newDirectory: URL) async throws {
 
 `manifestURL`には配布者が公開した**HTTPSのdownload.json URL**を渡します。
 この版の固定URLは[クイックスタート](getting-started.ja.md)に記載しています。
-現在はPrivateなので、URLSessionを使うこのAPIでの取得はPublic切り替え後に利用します。
 `newDirectory`は未作成の出力先にします。アプリがインストール済みモデルのパス・版を保持し、再起動時はそのパスを再利用します。
 SDKは自動更新、再開ダウンロード、既存フォルダへの上書きは行いません。
 コールバックはMainActorとは限りません。UI更新は`await MainActor.run { ... }`で行ってください。

@@ -1,64 +1,85 @@
 # クイックスタート
 
-[ドキュメント一覧](README.ja.md) · 次：[自分のアプリへ組み込む](sdk-guide.ja.md)
+[ドキュメント一覧](README.ja.md) · [SDKを自分のアプリへ組み込む](sdk-guide.ja.md)
 
-まず付属サンプルで「こんにちは。」を再生します。モデルを変換する作業は不要です。
+付属のサンプルアプリで、日本語の文章を読み上げます。モデルの変換は不要です。
+必要なのはXcode、iOS 18以上のiPhone、またはmacOS 15以上のApple Silicon Macです。
 
-## 1. ソースとモデルを用意する
+## 1. ソースを取得する
 
-必要なのはソース一式、共通モデル、声モデルの3つです。ソースGit／ZIPには大きなモデルファイルを含めていません。
-
-ソースは[Corvelis/sbv2-coreml・v0.1.0-dev2](https://github.com/Corvelis/sbv2-coreml/tree/v0.1.0-dev2)から取得します。
-現在はPrivateなので、アクセス権のあるGitHubアカウントで取得してください。
+[ReleaseのソースZIP](https://github.com/Corvelis/sbv2-coreml/releases/tag/v0.1.0-dev3)をダウンロードして展開します。
+Gitを使う場合は次のコマンドでも取得できます。
 
 ```sh
-git clone --branch v0.1.0-dev2 https://github.com/Corvelis/sbv2-coreml.git
+git clone --branch v0.1.0-dev3 https://github.com/Corvelis/sbv2-coreml.git
 cd sbv2-coreml
 ```
 
-### Hugging Faceから取得する
+SDKを自分のアプリへ組み込む場合は[SDK導入ガイド](sdk-guide.ja.md)へ進んでください。
 
-共通モデルは[AILogDev/sbv2-coreml-common](https://huggingface.co/AILogDev/sbv2-coreml-common)、
-声モデルは[AILogDev/sbv2-coreml-jvnv-f1-jp](https://huggingface.co/AILogDev/sbv2-coreml-jvnv-f1-jp)です。
-現在はPrivateなので、アクセス権のあるアカウントで取得してください。
-[Hugging Face公式CLI](https://huggingface.co/docs/huggingface_hub/guides/cli)をインストールし、
-`Package.swift`のあるフォルダで実行します。トークンは`hf auth login`の入力欄で扱います。
+## 2. サンプルアプリを起動する
+
+`Examples/Apple/SBV2Demo.xcodeproj`をXcodeで開きます。
+
+### Mac
+
+1. Schemeに **SBV2Demo-macOS**、実行先にApple Silicon Macを選ぶ。
+2. Runを押す。
+
+### iPhone
+
+1. Schemeに **SBV2Demo-iOS** を選ぶ。
+2. ターゲットの **Signing & Capabilities** で自分のTeamと固有のBundle Identifierを設定する。
+3. iPhoneを接続して実行先に選び、Runを押す。端末で開発者モード等の確認が求められたら設定する。
+
+## 3. 共通モデルと声モデルを取得する
+
+ソースZIPにはモデルの重みを含めていません。次の2つが必要です。
+
+| モデル | 内容 | 配布ファイルの容量 |
+|---|---|---|
+| [共通モデル](https://huggingface.co/AILogDev/sbv2-coreml-common) | BERT・Open JTalk辞書 | 約1.52 GB |
+| [JVNV F1 JP-Extra](https://huggingface.co/AILogDev/sbv2-coreml-jvnv-f1-jp) | 声モデル | 約294 MB |
+
+ダウンロードと初回コンパイルには、上記の容量に加えて空き容量が必要です。
+
+1. アプリ右上のスライダーアイコンから **モデル設定** を開く。
+2. **URLからモデルを取得** を開き、**取得するモデル → 共通モデル** を選ぶ。
+3. 次の共通モデルURLを貼り付け、**ダウンロード** を押して完了まで待つ。
+4. **取得するモデル → 声モデル** に切り替え、声モデルURLで同じ操作を行う。
+5. 両方を取得したら **完了** でメイン画面へ戻る。
+
+**共通モデルURL**
+
+```text
+https://huggingface.co/AILogDev/sbv2-coreml-common/resolve/d9cc585298e2d59fb1df384fb62a1e15d73f8add/download.json
+```
+
+**声モデルURL**
+
+```text
+https://huggingface.co/AILogDev/sbv2-coreml-jvnv-f1-jp/resolve/17faac326f120b171170f10807bb26b0da8257d9/download.json
+```
+
+この欄には`download.json`のURLを入力します。リポジトリのWebページや圧縮アーカイブのURLは使えません。
+取得後の音声合成はオフラインで動作します。
+
+### Macでダウンロードしてフォルダを選ぶ場合
+
+[Hugging Face CLI](https://huggingface.co/docs/huggingface_hub/guides/cli)をインストールし、リポジトリのルートで実行します。
 
 ```sh
-hf auth login
 hf download AILogDev/sbv2-coreml-common \
-  --revision 32936e692da19a380178a73d908f0075b49010bd \
+  --revision d9cc585298e2d59fb1df384fb62a1e15d73f8add \
   --local-dir models/sbv2-coreml-common
 hf download AILogDev/sbv2-coreml-jvnv-f1-jp \
-  --revision 85b5dce3dc8b293526df4ff1e5e1c934d9ecee73 \
+  --revision 17faac326f120b171170f10807bb26b0da8257d9 \
   --local-dir models/sbv2-coreml-jvnv-f1-jp
 ```
 
-取得できたら手順2へ進みます。iPhoneへ移す場合は、取得した2フォルダを丸ごとコピーします。
-
-### ローカルのモデルアーカイブから用意する場合
-
-この公開準備用の作業コピーでは、`artifacts/releases/`に次の配布ファイルがあります。
-配布ファイルを別途受け取った場合も、同じ場所に置くと以下のコマンドをそのまま使えます。
-
-```text
-sbv2-coreml/                     ← Package.swiftがあるフォルダ
-  Package.swift
-  Examples/
-  artifacts/releases/
-    sbv2-coreml-common-0.1.0-dev2.tar.gz
-    sbv2-coreml-jvnv-f1-jp-0.1.0-dev2.tar.gz
-```
-
-ターミナルで`Package.swift`のあるフォルダを開き、展開します。`models/`は新規、または空の状態で始めてください。
-
-```sh
-mkdir -p models
-tar -xzf artifacts/releases/sbv2-coreml-common-0.1.0-dev2.tar.gz -C models
-tar -xzf artifacts/releases/sbv2-coreml-jvnv-f1-jp-0.1.0-dev2.tar.gz -C models
-```
-
-Finderで展開しても構いません。最終的に次の配置になれば準備完了です。
+取得後、アプリの **モデル設定** で **共通モデル** と **声モデル** のフォルダを選びます。
+共通モデルを選ぶとBERTと辞書を自動認識します。
+iPhoneへ移す場合は、Finderのファイル共有でサンプルアプリへ2フォルダを丸ごとコピーするか、Filesから選べる場所へ置きます。
 
 ```text
 models/
@@ -73,40 +94,29 @@ models/
 ```
 
 `.mlpackage`はフォルダ全体がモデルです。中の`model.mlmodel`だけを取り出さないでください。
-モデルのハッシュ確認は[変換ガイドのverify](conversion.ja.md)に記載しています。
+iCloud等を使う場合も、中身がすべて端末へダウンロードされている必要があります。
 
-## 2. Macで起動する
+## 4. 音声を生成して再生する
 
-1. Xcodeで`Examples/Apple/SBV2Demo.xcodeproj`を開く。
-2. Schemeを`SBV2Demo-macOS`、実行先をApple Silicon Macにする。
-3. Runを押す。
-4. 右上の**モデル設定**を開き、**共通モデル**で`sbv2-coreml-common`を選ぶ。内部のBERTと辞書を自動認識します。
-5. **声モデル**で`sbv2-coreml-jvnv-f1-jp`を選び、「完了」でメイン画面へ戻る。
-6. 「モデルを準備」を押し、準備完了まで待つ。
-7. 文章欄に「こんにちは。」と入力して「生成して再生」を押す。全文の生成後に再生が始まります。
+1. **モデルを準備** を押し、準備完了まで待つ。
+2. 文章欄へ「こんにちは。」と入力する。
+3. **生成して再生** を押す。全文の生成後に音声が再生されます。
 
-声のスタイルを変える場合は準備後の文章カード右上で選びます。JVNVにはNeutral、Angry、Disgust、Fear、Happy、Sad、Surpriseがあります。
-再生中は停止ボタン、完了後は再再生ボタンが表示されます。再再生は生成済みの音声を使います。
-読み上げを止めるときは停止ボタンを押します。処理中のCore ML呼び出しが終わるまで停止完了を待つ場合があります。
-各ボタンの意味、RTF表示、声の変更は[サンプルアプリの使い方](sample-app.ja.md)にまとめています。
+準備後はスタイルを変更できます。JVNVにはNeutral、Angry、Disgust、Fear、Happy、Sad、Surpriseがあります。
+停止ボタンで合成・再生を停止し、再再生ボタンで最後の音声をもう一度再生できます。
+[サンプルアプリの使い方](sample-app.ja.md)
 
-## 3. iPhoneで起動する
+初回はCore MLのコンパイル・モデルの読み込み・ウォームアップに時間がかかります。
+コンパイルキャッシュを残すと、次回の準備時間を短縮できます。
+入力の長さが変わると、初回推論の準備が追加で発生する場合があります。
 
-1. 同じXcodeプロジェクトで`SBV2Demo-iOS`を選ぶ。
-2. ターゲットの「Signing & Capabilities」で自分のTeamと固有のBundle Identifierを指定する。
-3. 接続したiPhoneを実行先にしてRunする。実行対象はiOS 18以上です。
-4. 展開済みの2つのモデルフォルダをiPhoneへ移す。Finderのファイル共有でサンプルアプリへコピーするか、Filesから選択できる場所へ置きます。
-5. **モデル設定**の**共通モデル**で共通フォルダ、**声モデル**で声フォルダを選ぶ。
-6. 「モデルを準備」→「生成して再生」の順に操作する。
+再起動後、モデルを選び直す必要がある場合は、**モデル設定**から取得済みフォルダを指定してください。
+サンプルのDocuments直下に`sbv2-coreml-common`と`sbv2-coreml-jvnv-f1-jp`を置いた場合は自動検出します。
+iPhoneでは **ファイル → このiPhone内 → SBV2 Core ML** から保存済みフォルダを確認できます。
 
-サンプルのDocuments直下に上記の名前で2フォルダを置いた場合は、起動時に自動検出します。
-iCloudなどから選択する場合は、フォルダ内のモデルが端末へ完全にダウンロードされていることを確認してください。
-読み取り専用の場所でコンパイルキャッシュの保存に失敗した場合は、サンプルのDocumentsへコピーして選び直します。
-ソースの編集やモデルの変換をiPhone上で行う必要はありません。
+## MacのターミナルからWAVを作る
 
-## 4. ターミナルからWAVを生成する
-
-リポジトリ直下で、手順1の配置のまま実行できます。
+モデルを上記の`models/`へ取得した後、リポジトリのルートで実行します。
 
 ```sh
 swift run -c release sbv2-say \
@@ -117,28 +127,6 @@ swift run -c release sbv2-say \
 afplay output.wav
 ```
 
-`output.wav`はモノラル44.1 kHz、16 bit PCMです。任意で文章の後に`Happy 0`のようにスタイル名と話者IDを指定できます。
-CLIはウォームアップを自動実行しません。表示される合成時間は初回推論の影響を含む場合があります。
+出力はモノラル44.1 kHz、16 bit PCMです。文章の後に`Happy 0`のようにスタイル名と話者IDを指定できます。
 
-## 初回だけ遅い場合
-
-初回には、モデルのコンパイル、読み込み、初回推論の準備が発生します。
-サンプルの「モデルを準備」はこの待ち時間を対話前にまとめるための操作です。
-形状の異なる初回入力まで、すべて事前実行するものではありません。[実測値と条件](verification.ja.md)を参照してください。
-
-## サンプルからのHTTPS取得はPublic切り替え後に使う
-
-Hugging Faceへ公開した各モデルの`download.json`のURLを、モデル設定の「URLからモデルを取得」に指定できます。
-「取得するモデル」で共通モデルと声モデルを選び、別々に取得します。
-リポジトリのWebページや`.tar.gz`のURLをこの欄に入れることはできません。
-固定版のURLは次のとおりです。
-
-```text
-https://huggingface.co/AILogDev/sbv2-coreml-common/resolve/32936e692da19a380178a73d908f0075b49010bd/download.json
-https://huggingface.co/AILogDev/sbv2-coreml-jvnv-f1-jp/resolve/85b5dce3dc8b293526df4ff1e5e1c934d9ecee73/download.json
-```
-
-サンプルにはHugging Face認証機能がありません。Privateの間は手順1のCLIで取得したフォルダを選びます。
-サンプル自身による匿名HTTPS取得・取得後の合成・再起動後の再選択は、Public切り替え後に確認します。
-
-困った場合は[トラブルシューティング](troubleshooting.ja.md)へ進んでください。
+モデルが読み込めない、音が出ない場合は[トラブルシューティング](troubleshooting.ja.md)を参照してください。

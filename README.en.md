@@ -1,99 +1,41 @@
 # SBV2 Core ML
 
-[日本語（メイン）](README.md)
+[日本語](README.md)
 
-Native Japanese **Style-Bert-VITS2 JP-Extra** speech synthesis for **iOS 18+** and
-**macOS 15+ on Apple Silicon**. Includes a Swift Package, iPhone/Mac example apps,
-a WAV command-line tool, and a checkpoint-to-Core-ML converter.
+Japanese Style-Bert-VITS2 JP-Extra speech synthesis for iPhone and Apple Silicon Mac.
+Includes a Swift SDK, native sample apps, a WAV CLI and a voice-model converter.
+Inference runs on-device through Core ML. Python and ONNX Runtime are not required in your app.
 
-[日本語ドキュメント](docs/README.ja.md) · [Conversion](docs/conversion.md) · [Model format](docs/model-format.md)
-· [Licenses](THIRD_PARTY_NOTICES.md) · [Release procedure](docs/releasing.md)
+## Requirements
 
-## Documentation
+- iOS 18+ or macOS 15+ on Apple Silicon.
+- Xcode to build the SDK or sample app.
+- Both the [shared BERT/dictionary](https://huggingface.co/AILogDev/sbv2-coreml-common)
+  and the [JVNV voice](https://huggingface.co/AILogDev/sbv2-coreml-jvnv-f1-jp).
+  Model weights are downloaded separately from the source/SDK.
 
-The complete Japanese guide includes a local-file Quick Start, SDK integration, all public
-Swift APIs, troubleshooting, conversion, model format, licensing and release instructions.
-English overview and technical notes remain below and in the linked English pages.
+[Source downloads](https://github.com/Corvelis/sbv2-coreml/releases/tag/v0.1.0-dev3) ·
+[Quick Start](docs/getting-started.ja.md) · [SDK guide](docs/sdk-guide.ja.md) ·
+[Sample app](docs/sample-app.ja.md) · [API reference](docs/api-reference.ja.md) ·
+[Troubleshooting](docs/troubleshooting.ja.md)
 
-| Task | Guide |
-|---|---|
-| Run the sample from source and model archives | [Quick Start (日本語)](docs/getting-started.ja.md) |
-| Add the SDK to an Xcode app | [SDK integration (日本語)](docs/sdk-guide.ja.md) |
-| Look up methods, options and cancellation | [Swift API reference (日本語)](docs/api-reference.ja.md) |
-| Diagnose loading, latency, audio gaps and storage | [Troubleshooting (日本語)](docs/troubleshooting.ja.md) |
+## Add the SDK
 
-Source: [Corvelis/sbv2-coreml](https://github.com/Corvelis/sbv2-coreml),
-tag [v0.1.0-dev2](https://github.com/Corvelis/sbv2-coreml/tree/v0.1.0-dev2).
-The source and both Hugging Face model repositories are currently private and require access.
-Obtaining source alone does not download model weights. See the
-[Quick Start](docs/getting-started.ja.md) for source and authenticated model downloads.
-
-| Model package | Repository |
-|---|---|
-| Shared BERT and dictionary | [AILogDev/sbv2-coreml-common](https://huggingface.co/AILogDev/sbv2-coreml-common) |
-| JVNV F1 JP-Extra voice | [AILogDev/sbv2-coreml-jvnv-f1-jp](https://huggingface.co/AILogDev/sbv2-coreml-jvnv-f1-jp) |
-
-Pinned revisions and upload verification are recorded in the [release guide](docs/releasing.md).
-
-## Contents
-
-- **Swift runtime:** Core ML BERT, encoder/DP, SDP, Flow and waveform decoder.
-  Japanese text processing uses bundled Open JTalk source and a separately obtained dictionary.
-  No Flutter, Python or ONNX Runtime is needed in the application.
-- **Separate voices:** reuse one shared BERT/dictionary with multiple voice packages.
-- **Sample playback:** generate the complete utterance, then play one Float32 buffer. Replay and cancellation are included.
-- **Conversion:** input an AivisHub URL, one AIVM, or a Safetensors checkpoint with config/style vectors.
-  The public conversion path exports directly from PyTorch without an intermediate ONNX file.
-- **Distribution:** model checksums, provenance, license preservation and local HF upload staging.
-
-This is a pre-release source distribution. See [verification](docs/verification.md) for the
-tested models, device measurements and remaining release checks. The sample voice is JVNV F1 JP-Extra;
-it requires the shared BERT and dictionary. Anonymous HTTPS installation is pending public visibility.
-
-## Run on a Mac
-
-With Xcode installed, and the two model folders obtained or prepared:
-
-```sh
-swift run -c release sbv2-say \
-  /path/to/sbv2-coreml-common/bert \
-  /path/to/sbv2-coreml-jvnv-f1-jp \
-  /path/to/sbv2-coreml-common/dictionary \
-  output.wav "こんにちは。今日はいい天気ですね。"
-```
-
-The CLI optionally accepts `STYLE SPEAKER_ID` after the text. Models compile on first use.
-Allow extra time and disk space for the initial compilation. Retain the resulting caches for faster reopening.
-
-## iPhone / Mac apps
-
-Open `Examples/Apple/SBV2Demo.xcodeproj`:
-
-1. Choose `SBV2Demo-iOS` or `SBV2Demo-macOS`.
-2. For iPhone, select your signing team and a unique bundle identifier.
-3. Open **モデル設定** and choose **共通モデル** and **声モデル**. The dictionary is detected automatically.
-4. Press **モデルを準備**, then **生成して再生**. Playback starts after the complete utterance has been generated.
-
-The [sample app guide (Japanese)](docs/sample-app.ja.md) explains each control, styles, replay, RTF and voice switching.
-
-For public repositories, alternatively enter an HTTPS URL for a release's `download.json`. Each file is downloaded and
-verified before installation. Copying the two model folders into the iOS app's Documents folder
-also works. The app's speech synthesis works offline once resources are present.
-
-## Use in Swift
-
-In Xcode, add `https://github.com/Corvelis/sbv2-coreml.git` as a package dependency,
-choose **Exact Version: 0.1.0-dev2**, and add the **SBV2CoreML** product to your app.
-The private repository requires a GitHub account with access. Then import `SBV2CoreML`:
+In Xcode, select **File → Add Package Dependencies**, enter
+`https://github.com/Corvelis/sbv2-coreml.git`, choose **Exact Version: 0.1.0-dev3**,
+and add the **SBV2CoreML** product to your app.
 
 ```swift
 import Foundation
 import SBV2CoreML
 
-// JVNV sample voice: speaker 0 and Neutral style.
-func renderSample(paths: ModelPaths) async throws -> Data {
+// JVNV: speaker 0, Neutral style.
+func renderSample(common: URL, voice: URL) async throws -> Data {
     let speech = SpeechSynthesizer()
-    try await speech.load(paths)
+    try await speech.load(ModelPaths(
+        bert: common.appendingPathComponent("bert"),
+        voice: voice,
+        dictionary: common.appendingPathComponent("dictionary")))
     try await speech.warmUp()
     let audio = try await speech.synthesize("こんにちは。お元気ですか？")
     let wav = try audio.wav()
@@ -102,43 +44,52 @@ func renderSample(paths: ModelPaths) async throws -> Data {
 }
 ```
 
-`ModelPaths` takes local BERT, voice and dictionary directory URLs. Keep the synthesizer
-loaded between utterances in a chat application. The function above is a single WAV example.
-The sample uses `synthesize` and `AudioPlayer` to play a complete utterance.
-The SDK also exposes an optional `stream` API for applications that need segment delivery;
-see the [API reference](docs/api-reference.ja.md).
-Read `VoiceInfo.styles`/`speakers` when choosing options: not every voice has a `Neutral` style.
-Cancellation takes effect between native inference calls; an in-flight Core ML call is allowed to finish.
+Pass the downloaded shared and voice folder URLs. Retain one synthesizer and call
+`load`/`warmUp` once when preparing an app for repeated utterances.
+The SDK returns PCM; your app handles playback. The sample demonstrates AVAudioEngine playback,
+replay and cancellation. See the [SDK guide](docs/sdk-guide.ja.md).
 
-## Convert a voice
+## Run the sample
+
+Open `Examples/Apple/SBV2Demo.xcodeproj` in Xcode. Select `SBV2Demo-iOS` or
+`SBV2Demo-macOS`; for iPhone, set your signing team and a unique bundle identifier.
+Choose the shared and voice folders in **モデル設定**, press **モデルを準備**,
+then enter Japanese text and press **生成して再生**.
+The app generates the complete utterance before playing it.
+
+## Create a WAV on Mac
+
+Download both model repositories into `models/`, then run from the source root:
+
+```sh
+swift run -c release sbv2-say \
+  models/sbv2-coreml-common/bert \
+  models/sbv2-coreml-jvnv-f1-jp \
+  models/sbv2-coreml-common/dictionary \
+  output.wav "こんにちは。今日はいい天気ですね。"
+afplay output.wav
+```
+
+You can append `STYLE SPEAKER_ID`, for example `Happy 0`.
+Models compile on first use. Keep the compiled caches for faster subsequent loads.
+
+## Convert another voice
+
+Use Apple Silicon macOS and Python 3.11:
 
 ```sh
 python3.11 -m venv .venv
 .venv/bin/python -m pip install './converter[convert]' -c converter/requirements-lock-macos-arm64.txt
-.venv/bin/sbv2-coreml doctor
 .venv/bin/sbv2-coreml convert --aivm voice.aivm --output models/my-voice
 ```
 
-The pinned upstream source is acquired automatically. [More inputs and validation details](docs/conversion.md).
-Conversion requires macOS/Python 3.11; the runtime itself only requires the Apple SDK and models.
+Supported inputs: AivisHub URLs, AIVM, or Safetensors with config/style vectors.
+Compatible voices reuse the shared BERT/dictionary.
+ONNX/AIVMX-only inputs, standard SBV2 and multilingual profiles are not supported.
+[Conversion guide](docs/conversion.md) · [Model format](docs/model-format.md)
 
-## Scope and licenses
+## Licenses
 
-The supported profile is Japanese JP-Extra, 44.1 kHz, hop 512, 1024-dimensional BERT,
-256-dimensional styles, and the documented decoder architecture. Arbitrary SBV2 forks and
-AIVMX-only downloads are not supported. Internal capacity limits can require additional text splits.
-
-Code is distributed under **AGPL-3.0**, with retained notices for third-party components.
-The converted JVNV voice and common DeBERTa carry **CC BY-SA 4.0**; the dictionary has separate BSD notices.
-Other voices retain their own terms. See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
-This repository does not grant permission to use third-party character artwork or trademarks.
-
-## Development
-
-```sh
-swift test
-PYTHONPATH=converter .venv/bin/python -m unittest discover -s converter/tests -v
-python3 scripts/check_docs.py --swift
-```
-
-No remote repository, package registry or model upload is created by these commands.
+Code: **AGPL-3.0**. Shared BERT and JVNV voice: **CC BY-SA 4.0**.
+The dictionary and other voices retain their own terms.
+[Third-party notices](THIRD_PARTY_NOTICES.en.md)

@@ -35,13 +35,10 @@ match that architecture; changing the model structure can require runtime/conver
 The converter exports encoder/DP, SDP, full Flow, and the upstream Decoder directly from
 PyTorch. Decoder weight normalization is materialized in FP32 and checked before export.
 No intermediate ONNX is required. Core ML Tools and the model implementation remain Python dependencies.
-The pinned upstream eagerly imports ONNX Runtime in a utility module. Conversion uses a
-temporary source copy with that optional import moved into its unused ONNX helper. The patch
-is recorded in provenance; original source/weights are not modified. ONNX Runtime is not installed.
+Original source files and weights are not modified. ONNX Runtime is not required.
 
 The reference path uses FP32. The fixed 256-frame and 32-frame fast decoders retain FP32 in
-sensitive early/conditioning layers and use FP16 for other operations. Their historical
-function names end in `_fp16`; `decoder_validation.json` specifies the actual mixed precision.
+sensitive early/conditioning layers and use FP16 for other operations. Function names end in `_fp16`; `decoder_validation.json` specifies the actual mixed precision.
 If a fixed decoder exceeds the numerical error bounds, it is re-exported in FP32 and
 checked against the stricter FP32 bounds. The report records both attempts and the effective
 precision; a fallback can be slower and must be measured for that voice.
@@ -67,7 +64,7 @@ For a self-trained model, specify its actual redistribution terms and source att
 sbv2-coreml convert --checkpoint model.safetensors --output models/my-voice \
   --license-file LICENSE.md --license-id cc-by-sa-4.0 --source-url https://example.org/my-model
 sbv2-coreml verify models/my-voice
-sbv2-coreml package --input models/my-voice --output artifacts/my-voice.tar.gz
+sbv2-coreml package --input models/my-voice --output output/my-voice.tar.gz
 ```
 
 The license ID above is an example, not a license automatically granted to every input.
@@ -87,4 +84,3 @@ sbv2-coreml build-bert --checkpoint-dir /path/to/checkpoint --output models/bert
 
 This reproduces the two-block FP32 layout with shapes 64/128/256. It is separate from
 voice conversion because the shared BERT does not change when replacing a compatible voice.
-The release preparation script adds model cards, dictionary, license, provenance and checksums.

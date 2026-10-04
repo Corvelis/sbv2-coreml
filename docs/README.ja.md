@@ -1,8 +1,9 @@
 # SBV2 Core ML ドキュメント
 
+[English](../README.en.md)
+
 Style-Bert-VITS2 JP-ExtraをiPhone／Apple Silicon Macで使うためのSDK、サンプル、変換ツールです。
 アプリ内の推論にPython・Flutter・ONNX Runtimeは不要です。
-ドキュメントは日本語を基本とし、英語版は補助として案内します。
 
 ## 目的から読む
 
@@ -15,14 +16,13 @@ Style-Bert-VITS2 JP-ExtraをiPhone／Apple Silicon Macで使うためのSDK、�
 | AivisHubや自作モデルの声を使う | [変換ガイド・CLIリファレンス](conversion.ja.md) |
 | モデルの構造、保存場所、サイズを調べる | [モデル仕様](model-format.ja.md) |
 | 初期化失敗、遅延、容量、音切れを調べる | [トラブルシューティング](troubleshooting.ja.md) |
-| 速度や精度の検証範囲を知る | [検証記録](verification.ja.md) |
-| コードやモデルを再配布する | [ライセンスと出典](licenses.ja.md)、[公開手順](releasing.ja.md) |
+| コードやモデルを再配布する | [ライセンスと出典](licenses.ja.md) |
 
 ## 配布物
 
 | 配布物 | 内容 | 入手・配置 |
 |---|---|---|
-| SDKとサンプル | Swift Package、iPhone／Macアプリ、WAV出力CLI、Python変換ツール | [Corvelis/sbv2-coreml・v0.1.0-dev2](https://github.com/Corvelis/sbv2-coreml/tree/v0.1.0-dev2)／ソースZIP |
+| SDKとサンプル | Swift Package、iPhone／Macアプリ、WAV出力CLI、Python変換ツール | [Corvelis/sbv2-coreml・v0.1.0-dev3](https://github.com/Corvelis/sbv2-coreml/tree/v0.1.0-dev3)／ソースZIP |
 | 共通モデル | 日本語BERTとOpen JTalk辞書、約1.52 GB | [AILogDev/sbv2-coreml-common](https://huggingface.co/AILogDev/sbv2-coreml-common) |
 | サンプルの声 | JVNV F1 JP-Extra、約294 MB | [AILogDev/sbv2-coreml-jvnv-f1-jp](https://huggingface.co/AILogDev/sbv2-coreml-jvnv-f1-jp) |
 
@@ -34,19 +34,6 @@ Style-Bert-VITS2 JP-ExtraをiPhone／Apple Silicon Macで使うためのSDK、�
 - iOS 18以上、macOS 15以上のApple Silicon。速度の確認には実機を使ってください。
 - 日本語JP-Extra、44.1 kHz、文書化した構造のモデル。通常版SBV2、多言語版、任意の派生構造は対象外です。
 - 変換はApple Silicon Mac、Python 3.11で行います。変換済みモデルを使うだけならPythonは不要です。
-- Xcode 27.0でビルド確認済み。すべての対応OS・Xcode版・機種を実測したわけではありません。
-
-## 公開状況
-
-2026-10-04にHugging Faceの2つのPrivateリポジトリへアップロードしました。全43ファイルの
-リモートのハッシュと認証付きマニフェスト取得を確認済みです。
-[クイックスタート](getting-started.ja.md)に認証付きの取得とローカルフォルダからの使用方法を記載しています。
-GitHubには[Corvelis/sbv2-coreml](https://github.com/Corvelis/sbv2-coreml)とタグ`v0.1.0-dev2`を用意し、
-モデルカードからそのタグへリンクしています。GitHub・HFとも現在はPrivateです。
-Public切り替え後のサンプルの匿名HTTPS取得確認が残っています。
-固定モデル版と記録は[公開手順](releasing.ja.md)を参照してください。
 
 コードはAGPL-3.0、JVNVと共通BERTはCC BY-SA 4.0です。辞書・他の声にはそれぞれの条件があります。
 本文の要約に加え、[ライセンス原文と第三者表記](../THIRD_PARTY_NOTICES.md)も確認してください。
-
-[English（補助）](../README.en.md)

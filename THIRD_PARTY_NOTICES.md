@@ -1,6 +1,6 @@
 # ライセンスと出典
 
-[日本語ライセンスガイド](docs/licenses.ja.md) · [English（補助）](THIRD_PARTY_NOTICES.en.md)
+[日本語ライセンスガイド](docs/licenses.ja.md) · [English](THIRD_PARTY_NOTICES.en.md)
 
 ## コード
 
@@ -12,7 +12,7 @@ Style-Bert-VITS2のモデル変換・日本語前処理の実装を含み、Swif
 | 構成要素・作者 | 出典・条件 |
 |---|---|
 | Style-Bert-VITS2・litagin氏と貢献者 | [元リポジトリ](https://github.com/litagin02/Style-Bert-VITS2)、固定コミット`66de777e06392c0f313600be03c43ef96658b244`、AGPL-3.0。一部のユーザー辞書コードはLGPL-3.0で、原文を`LICENSES/SBV2-LGPL-3.0.txt`に保持しています。 |
-| StackChan Talk／Local AIのネイティブ実装 | ローカルの元プロジェクトから抽出しました。Apache-2.0の表記を`LICENSES/LocalAI-Apache-2.0.txt`に保持し、抽出記録に元ファイルのハッシュを記載しています。組み合わせた配布物は既存の第三者表記を保ちAGPL-3.0で提供します。 |
+| StackChan Talk／Local AIのネイティブ実装 | Apache-2.0。原ライセンスを`LICENSES/LocalAI-Apache-2.0.txt`に保持しています。 |
 | Open JTalk・HTS Working Group／名古屋工業大学 | BSD系条件。原文は`LICENSES/OpenJTalk-COPYING`、作者は`LICENSES/OpenJTalk-AUTHORS`です。 |
 | MeCab・工藤拓氏／NTTと貢献者 | 同梱するBSD系条件は`LICENSES/OpenJTalk-mecab-COPYING`です。ソース内の原表記も保持しています。 |
 | Transformers DeBERTa・Hugging Faceの貢献者 | [元リポジトリ](https://github.com/huggingface/transformers)、Apache-2.0。BERTエクスポーターでforward演算を使用・変更しています。原文は`LICENSES/Transformers-Apache-2.0.txt`です。 |
@@ -20,11 +20,6 @@ Style-Bert-VITS2のモデル変換・日本語前処理の実装を含み、Swif
 | PyTorch・貢献者 | BSD系条件。インストールするPython依存関係にはそれぞれのライセンスが適用されます。 |
 | NumPy・NumPy開発者 | BSD-3-Clause。インストールするPython依存関係にはそれぞれのライセンスが適用されます。 |
 | Safetensors・Hugging Face | Apache-2.0。インストールするPython依存関係にはそれぞれのライセンスが適用されます。 |
-
-変更内容は、非同期Swiftラッパー、独立したパッケージ構成、文章・モデル容量に基づく分割、
-取得時のハッシュ検証、サンプルアプリ、Decoderの直接変換、入力正規化、配布ツールです。
-開始時点のファイルは`docs/source-inventory.json`に記録しています。
-変換ツールが取得する上流ソースにも、その原表記を保持します。
 
 ## モデルと辞書
 
@@ -41,4 +36,4 @@ Style-Bert-VITS2のモデル変換・日本語前処理の実装を含み、Swif
 Hugging Face向けのモデルフォルダには、出典・原ライセンス・変換説明・ハッシュを保持します。
 変換物は非公式で、原作者による承認・推奨を示すものではありません。
 
-このページは日本語の案内です。ライセンスの原文は各ファイルに保持しています。
+ライセンスの原文は各ファイルに保持しています。

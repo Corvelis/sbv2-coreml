@@ -1,6 +1,6 @@
 # Licensing and provenance
 
-[日本語（メイン）](THIRD_PARTY_NOTICES.md)
+[日本語](THIRD_PARTY_NOTICES.md)
 
 [日本語の案内](docs/licenses.ja.md)
 
@@ -16,10 +16,8 @@ AGPL obligations, including corresponding source where applicable, remain releva
   pinned commit `66de777e06392c0f313600be03c43ef96658b244`, AGPL-3.0.
   The upstream repository identifies LGPL-3.0 for portions of user dictionary code;
   its license is retained in `LICENSES/SBV2-LGPL-3.0.txt`.
-- **StackChan Talk / Local AI native implementation**: code extracted from the local source
-  project with its Apache-2.0 notice retained in `LICENSES/LocalAI-Apache-2.0.txt`.
-  The extraction inventory records original file hashes. The combined work is distributed
-  under AGPL-3.0 while preserving existing third-party notices.
+- **StackChan Talk / Local AI native implementation**, Apache-2.0.
+  Original license: `LICENSES/LocalAI-Apache-2.0.txt`.
 - **Open JTalk**, HTS Working Group / Nagoya Institute of Technology, BSD-style terms:
   `LICENSES/OpenJTalk-COPYING`, authors in `LICENSES/OpenJTalk-AUTHORS`.
 - **MeCab**, Taku Kudo / NTT and contributors, bundled BSD terms:
@@ -31,11 +29,6 @@ AGPL obligations, including corresponding source where applicable, remain releva
   Python dependency, not included in the Swift application. Its license is retained in `LICENSES`.
 - **PyTorch**, its contributors, BSD-style terms; **NumPy**, NumPy developers, BSD-3-Clause;
   **Safetensors**, Hugging Face, Apache-2.0. Installed Python dependencies retain their own licenses.
-
-Extraction changes include a public asynchronous Swift wrapper, standalone package targets,
-sentence/capacity segmentation, download verification, sample applications, direct decoder
-conversion, input normalization and release tools. `docs/source-inventory.json` records the
-starting files. The upstream source downloaded by the converter retains its own full notices.
 
 ## Models and dictionary
 
