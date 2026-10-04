@@ -2,11 +2,10 @@
 
 [ドキュメント一覧](README.ja.md) · [使用例](sdk-guide.ja.md)
 
-対象は`SBV2CoreML`の公開API、バージョン`0.1.0.dev2`です。
+対象は`SBV2CoreML`の公開API、バージョン`0.1.0-dev3`です。
 宣言の原本は[SpeechSynthesizer.swift](../Sources/SBV2CoreML/SpeechSynthesizer.swift)、
 [TextSegmenter.swift](../Sources/SBV2CoreML/TextSegmenter.swift)、
 [ModelDownloader.swift](../Sources/SBV2CoreML/ModelDownloader.swift)です。
-公開前のAPIで、今後変更する場合があります。
 
 ## ModelPaths
 
