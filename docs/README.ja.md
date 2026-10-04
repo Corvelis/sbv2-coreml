@@ -21,7 +21,7 @@ Style-Bert-VITS2 JP-ExtraをiPhone／Apple Silicon Macで使うためのSDK、�
 
 | 配布物 | 内容 | 入手・配置 |
 |---|---|---|
-| SDKとサンプル | Swift Package、iPhone／Macアプリ、WAV出力CLI、Python変換ツール | このリポジトリ／ソースZIP |
+| SDKとサンプル | Swift Package、iPhone／Macアプリ、WAV出力CLI、Python変換ツール | [Corvelis/sbv2-coreml・v0.1.0-dev1](https://github.com/Corvelis/sbv2-coreml/tree/v0.1.0-dev1)／ソースZIP |
 | 共通モデル | 日本語BERTとOpen JTalk辞書、約1.52 GB | [AILogDev/sbv2-coreml-common](https://huggingface.co/AILogDev/sbv2-coreml-common) |
 | サンプルの声 | JVNV F1 JP-Extra、約294 MB | [AILogDev/sbv2-coreml-jvnv-f1-jp](https://huggingface.co/AILogDev/sbv2-coreml-jvnv-f1-jp) |
 
@@ -40,8 +40,10 @@ Style-Bert-VITS2 JP-ExtraをiPhone／Apple Silicon Macで使うためのSDK、�
 2026-10-04にHugging Faceの2つのPrivateリポジトリへアップロードしました。全41ファイルの
 リモートのハッシュと認証付きマニフェスト取得を確認済みです。
 [クイックスタート](getting-started.ja.md)に認証付きの取得とローカルフォルダからの使用方法を記載しています。
-GitHubのソース公開・タグ、モデルカードからそのタグへのリンク、Public切り替え後のサンプルの
-匿名HTTPS取得確認が残っています。固定モデル版と記録は[公開手順](releasing.ja.md)を参照してください。
+GitHubには[Corvelis/sbv2-coreml](https://github.com/Corvelis/sbv2-coreml)とタグ`v0.1.0-dev1`を用意し、
+モデルカードからそのタグへリンクしています。GitHub・HFとも現在はPrivateです。
+Public切り替え後のサンプルの匿名HTTPS取得確認が残っています。
+固定モデル版と記録は[公開手順](releasing.ja.md)を参照してください。
 
 コードはAGPL-3.0、JVNVと共通BERTはCC BY-SA 4.0です。辞書・他の声にはそれぞれの条件があります。
 本文の要約に加え、[ライセンス原文と第三者表記](../THIRD_PARTY_NOTICES.md)も確認してください。

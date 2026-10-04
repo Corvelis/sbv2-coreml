@@ -7,6 +7,15 @@
 ## 1. ソースとモデルを用意する
 
 必要なのはソース一式、共通モデル、声モデルの3つです。ソースGit／ZIPには大きなモデルファイルを含めていません。
+
+ソースは[Corvelis/sbv2-coreml・v0.1.0-dev1](https://github.com/Corvelis/sbv2-coreml/tree/v0.1.0-dev1)から取得します。
+現在はPrivateなので、アクセス権のあるGitHubアカウントで取得してください。
+
+```sh
+git clone --branch v0.1.0-dev1 https://github.com/Corvelis/sbv2-coreml.git
+cd sbv2-coreml
+```
+
 ### Hugging Faceから取得する
 
 共通モデルは[AILogDev/sbv2-coreml-common](https://huggingface.co/AILogDev/sbv2-coreml-common)、
@@ -18,10 +27,10 @@
 ```sh
 hf auth login
 hf download AILogDev/sbv2-coreml-common \
-  --revision 94179fe62664d979791489969b5a9d1c1b335f34 \
+  --revision ba8c4356353a649438a3d9d18545768cc2215568 \
   --local-dir models/sbv2-coreml-common
 hf download AILogDev/sbv2-coreml-jvnv-f1-jp \
-  --revision e5a48afa6244ecd5128b85496ad0afbbef37365e \
+  --revision 8f323979b7ba0b1f6e44ba2650f8b274dbf1eb2f \
   --local-dir models/sbv2-coreml-jvnv-f1-jp
 ```
 
@@ -125,8 +134,8 @@ Hugging Faceへ公開した各モデルの`download.json`のURLを、モデル�
 固定版のURLは次のとおりです。
 
 ```text
-https://huggingface.co/AILogDev/sbv2-coreml-common/resolve/94179fe62664d979791489969b5a9d1c1b335f34/download.json
-https://huggingface.co/AILogDev/sbv2-coreml-jvnv-f1-jp/resolve/e5a48afa6244ecd5128b85496ad0afbbef37365e/download.json
+https://huggingface.co/AILogDev/sbv2-coreml-common/resolve/ba8c4356353a649438a3d9d18545768cc2215568/download.json
+https://huggingface.co/AILogDev/sbv2-coreml-jvnv-f1-jp/resolve/8f323979b7ba0b1f6e44ba2650f8b274dbf1eb2f/download.json
 ```
 
 サンプルにはHugging Face認証機能がありません。Privateの間は手順1のCLIで取得したフォルダを選びます。

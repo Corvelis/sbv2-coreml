@@ -6,6 +6,7 @@ import json
 import os
 import shutil
 from pathlib import Path
+from urllib.parse import urlparse
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -64,11 +65,28 @@ manifest downloader uses public repositories and does not accept access tokens.
         text = text.replace('## Attribution and changes\n', section+'## Attribution and changes\n', 1)
         readme.write_text(text)
 
+def link_source_cards(common, voice, source_url):
+    """Link the separately distributed code without changing any model weights."""
+    parsed = urlparse(source_url)
+    if parsed.scheme != 'https' or not parsed.netloc or any(c.isspace() for c in source_url):
+        raise ValueError('Source URL must be an HTTPS repository or release URL')
+    marker = '\n## SDK, sample apps and converter\n'
+    for folder in (common, voice):
+        readme = folder/'README.md'
+        text = readme.read_text().partition(marker)[0].rstrip()
+        readme.write_text(text+marker+f'''
+[SBV2 Core ML source and documentation]({source_url}) includes the Swift SDK,
+iPhone/Mac sample apps, and AIVM/Safetensors voice conversion tools.
+Follow the repository's Quick Start and SDK guide to use these models.
+The code is AGPL-3.0; model and dictionary licenses are listed above.
+''')
+
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     for name in ('bert','voice','dictionary','output'):parser.add_argument('--'+name,type=Path,required=True)
     parser.add_argument('--bert-checkpoint',type=Path,required=True)
     parser.add_argument('--hf-owner',help='Hugging Face user or organization for companion-repository links')
+    parser.add_argument('--source-url',help='HTTPS URL of the separately distributed source release')
     args=parser.parse_args()
     if args.output.exists():raise ValueError('Use a new output directory')
     provenance=json.loads((args.voice/'provenance.json').read_text())
@@ -184,6 +202,8 @@ The code and weights have separate licenses. The source release is AGPL-3.0.
 ''')
     if args.hf_owner:
         link_huggingface_cards(common,voice,args.hf_owner)
+    if args.source_url:
+        link_source_cards(common,voice,args.source_url)
     for path in (common,voice):
         (path/'.gitattributes').write_text('*.bin filter=lfs diff=lfs merge=lfs -text\n*.dic filter=lfs diff=lfs merge=lfs -text\n*.mlmodel filter=lfs diff=lfs merge=lfs -text\n')
         seal(path)

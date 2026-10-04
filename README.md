@@ -20,10 +20,11 @@ English overview and technical notes remain below and in the linked English page
 | Look up methods, options and cancellation | [Swift API reference (日本語)](docs/api-reference.ja.md) |
 | Diagnose loading, latency, audio gaps and storage | [Troubleshooting (日本語)](docs/troubleshooting.ja.md) |
 
-The converted models are uploaded to Hugging Face; both repositories are currently private.
-The GitHub source repository and release tag are still pending. Obtaining source alone does
-not download model weights. See the [Quick Start](docs/getting-started.ja.md) for authenticated
-model downloads and local model archives.
+Source: [Corvelis/sbv2-coreml](https://github.com/Corvelis/sbv2-coreml),
+tag [v0.1.0-dev1](https://github.com/Corvelis/sbv2-coreml/tree/v0.1.0-dev1).
+The source and both Hugging Face model repositories are currently private and require access.
+Obtaining source alone does not download model weights. See the
+[Quick Start](docs/getting-started.ja.md) for source and authenticated model downloads.
 
 | Model package | Repository |
 |---|---|
@@ -79,7 +80,9 @@ also works. The app's speech synthesis works offline once resources are present.
 
 ## Use in Swift
 
-Add this repository as a Swift Package, then import `SBV2CoreML`:
+In Xcode, add `https://github.com/Corvelis/sbv2-coreml.git` as a package dependency,
+choose **Exact Version: 0.1.0-dev1**, and add the **SBV2CoreML** product to your app.
+The private repository requires a GitHub account with access. Then import `SBV2CoreML`:
 
 ```swift
 import Foundation

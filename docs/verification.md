@@ -162,8 +162,14 @@ Generated comparison WAVs are retained locally with that verdict.
 
 ## Before a stable public release
 
-1. Choose the GitHub/Hugging Face owner/repository names; add immutable download links.
-2. Exercise the HTTPS downloader against those actual hosted manifests on a clean device.
+The GitHub/Hugging Face repositories, code tag, model-card source links and immutable
+model download links are now selected. The repositories remain private; all 41 hosted
+model files and authenticated manifest downloads were verified. See the
+[release guide](releasing.md) and [upload report](verification/huggingface-upload-20261004.json).
+
+After switching the model repositories to public, exercise the sample's anonymous HTTPS
+downloader against the pinned manifests on a clean device, then synthesize and reselect
+the downloaded folders after restarting the app. This check remains pending.
 
 Downstream applications also need deployment/signing and license review for their intended use.
 

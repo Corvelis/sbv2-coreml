@@ -19,11 +19,13 @@ Hugging Faceには2026-10-04にPrivate設定でアップロード済みです。
 
 | モデル | リポジトリ | 固定コミット |
 |---|---|---|
-| 共通 | [AILogDev/sbv2-coreml-common](https://huggingface.co/AILogDev/sbv2-coreml-common) | `94179fe62664d979791489969b5a9d1c1b335f34` |
-| 声 | [AILogDev/sbv2-coreml-jvnv-f1-jp](https://huggingface.co/AILogDev/sbv2-coreml-jvnv-f1-jp) | `e5a48afa6244ecd5128b85496ad0afbbef37365e` |
+| 共通 | [AILogDev/sbv2-coreml-common](https://huggingface.co/AILogDev/sbv2-coreml-common) | `ba8c4356353a649438a3d9d18545768cc2215568` |
+| 声 | [AILogDev/sbv2-coreml-jvnv-f1-jp](https://huggingface.co/AILogDev/sbv2-coreml-jvnv-f1-jp) | `8f323979b7ba0b1f6e44ba2650f8b274dbf1eb2f` |
 
-GitHubの公開先・タグは未確定です。確定後は、ルートREADME、日本語README、クイックスタート、両方のモデルカードを更新します。
-モデルカードから実際のコードのタグへリンクし、コード側からモデルの固定コミットの取得先へリンクします。
+コードの配布先は[Corvelis/sbv2-coreml](https://github.com/Corvelis/sbv2-coreml)、
+タグは[v0.1.0-dev1](https://github.com/Corvelis/sbv2-coreml/tree/v0.1.0-dev1)です。GitHubもPrivateです。
+モデルカードからコードのタグへリンクし、コード側から上記の固定モデル版の取得先へリンクしています。
+匿名HTTPS取得・初期状態のサンプルでの合成確認は、Public切り替え後に行います。
 
 ## 1. コードとドキュメントを検証する
 
@@ -68,7 +70,8 @@ python3 scripts/prepare_release.py \
   --voice input/jvnv-f1-jp-coreml \
   --dictionary input/open_jtalk_dic_utf_8-1.11 \
   --bert-checkpoint input/bert-checkpoint \
-  --output artifacts/huggingface --hf-owner AILogDev
+  --output artifacts/huggingface --hf-owner AILogDev \
+  --source-url https://github.com/Corvelis/sbv2-coreml/tree/v0.1.0-dev1
 ```
 
 このレシピは固定したJVNV・BERT・辞書専用で、原本のハッシュを確認します。他の声にJVNVの名前やモデルカードを付けるためには使えません。
@@ -76,6 +79,7 @@ python3 scripts/prepare_release.py \
 
 出力は`sbv2-coreml-common`と`sbv2-coreml-jvnv-f1-jp`です。
 `--hf-owner`は任意で、指定すると両方のモデルカードに配布先と共通／声の相互リンクを追加します。
+`--source-url`は任意で、別配布するコード版へのHTTPSリンクを両方のモデルカードに追加します。
 同一マシンでは不変の`.bin`重みをハードリンクして容量を節約する場合があります。リンクした重みをその場で編集しないでください。
 
 ## 3. 検聴と端末確認を行う
