@@ -23,7 +23,7 @@ Raw results: [Mac](verification/macos-sample-full-playback-20261004.json) and
 were approximately 0.096–0.106; the long sentence measured 0.070. These are individual
 observations, not controlled benchmarks or universal performance guarantees. No ASR/LLM
 was included. Playback completion does not establish perceptual audio quality. Hosted HF
-installation and listening comparisons against the original remain pending.
+installation remains pending. The completed listening review is recorded below.
 
 ## Physical iPhone UI operation — 2026-10-04
 
@@ -65,8 +65,11 @@ numerical bounds (SNR at least 35 dB, maximum absolute error at most 0.05).
 See the [natural voice report](verification/jvnv-natural-voice-20261004.json).
 
 Original/Core ML WAV pairs without loudness normalization were prepared locally.
-The listening verdict is not yet recorded; numerical checks do not establish perceptual
-equivalence. Concurrent Irodori inference and compilation exclude this run from speed evaluation.
+On 2026-10-04 the user reported listening through the complete comparison set and
+judged it acceptable, while reporting extremely rare noise. No case, timestamp or
+original/Core ML variant was identified for that noise. This completes the listening
+review with that qualification; it is not a finding of zero noise or perceptual identity.
+Concurrent Irodori inference and compilation exclude this run from speed evaluation.
 
 ## Historical sample UI verification before redesign — 2026-10-04
 
@@ -84,8 +87,9 @@ targets built successfully; the updated iPhone sample was installed and launched
 
 iPhone UI operation was pending at that point because mirroring required the phone to be locked.
 The current UI was subsequently checked with XCUITest as recorded above.
-Hosted Hugging Face download checks and listening comparisons against the original remain
-pending. Playback-queue completion does not establish perceptual voice quality.
+Hosted Hugging Face download checks and listening comparisons were also pending at that
+point. The current listening verdict is recorded above. Playback-queue completion itself
+does not establish perceptual voice quality.
 Individual observations and remaining checks are recorded in the
 [UI verification report](verification/sdk-ui-20261004.json).
 
@@ -152,16 +156,16 @@ This fallback prioritizes numerical fidelity and may be slower; no speed claim i
 for the resulting Kanon conversion. Effective precision is written into model metadata.
 
 The checks do not certify identical perceived voice quality. No training, integer
-quantization, or voice-weight substitution was used. A release review should listen to
-natural text across the intended styles/speakers, especially long vowels, silence, joins
-and sentence endings. Generated iPhone/Mac WAVs are retained locally for that review.
+quantization, or voice-weight substitution was used. The eleven-case natural-text comparison
+set was reviewed by the user, who judged it acceptable with extremely rare noise.
+Generated comparison WAVs are retained locally with that verdict.
 
 ## Before a stable public release
 
-1. Listen to the natural-text samples and compare the intended voice with its original.
-2. Choose the GitHub/Hugging Face owner/repository names; add immutable download links.
-3. Exercise the HTTPS downloader against those actual hosted manifests on a clean device.
-4. Confirm deployment/signing and license obligations for the intended downstream use.
+1. Choose the GitHub/Hugging Face owner/repository names; add immutable download links.
+2. Exercise the HTTPS downloader against those actual hosted manifests on a clean device.
+
+Downstream applications also need deployment/signing and license review for their intended use.
 
 Long-running thermal behavior, concurrent ASR/LLM scheduling, other voices/speakers and all
 supported OS versions are outside this standalone release's measurements. They should not

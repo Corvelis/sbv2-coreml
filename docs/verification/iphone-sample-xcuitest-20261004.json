@@ -62,7 +62,11 @@
     "Invalid frame dimension warning during the UI test; no layout defect in the inspected screenshots."
   ],
   "hostedDownload": "not performed: public URLs not configured",
-  "listening": "pending user verdict",
+  "listening": {
+    "status": "reviewed separately",
+    "report": "jvnv-natural-voice-20261004.json",
+    "verdict": "acceptable_with_rare_noise"
+  },
   "restoration": {
     "FilesViewMode": "original Icon Mode restored with a passing XCUITest",
     "sample": "normal application launched without diagnostic arguments",

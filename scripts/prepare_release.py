@@ -150,6 +150,14 @@ multifunction packaging. These tests do not establish identical voice quality
 for every sentence. See the source release's verification report for native
 device measurements and their scope; RTF 0.1 is not a universal guarantee.
 
+The 2026-10-04 review of 0.1.0-dev1 covered eleven natural-text cases including
+all seven styles. Whole-case SNR against the original FP32 voice was 46.05-47.01 dB,
+with identical phoneme durations and sample counts; frontend/BERT features and noise
+were shared for that comparison. The user listened through the comparison set and
+judged it acceptable, while reporting extremely rare noise. The affected case and
+original/Core ML variant were not identified. This is not a finding of zero noise.
+See the source release's verification report for the complete scope and results.
+
 The code and weights have separate licenses. The source release is AGPL-3.0.
 ''')
     for path in (common,voice):

@@ -4,7 +4,15 @@
   "referenceCheckpoint": "jvnv-F1-jp_e160_s14000.safetensors",
   "torch": "2.7.0",
   "listenPairs": "Each case contains pytorch.wav and coreml.wav. No loudness normalization.",
-  "listening": "not evaluated",
+  "listening": {
+    "date": "2026-10-04",
+    "reviewer": "user",
+    "status": "reviewed",
+    "verdict": "acceptable_with_rare_noise",
+    "scope": "User reports listening through the complete prepared comparison set.",
+    "observationJa": "比較音声を一通り聞いてみました。極稀にノイズが乗るものの問題ないと思います。",
+    "localization": "No case, timestamp, or original/Core ML variant was identified for the rare noise."
+  },
   "runs": [
     {
       "audioSeconds": 3.2275736961451247,
@@ -41,7 +49,7 @@
       "finite": true,
       "sameSampleCount": true,
       "numericalPassed": true,
-      "listening": "not evaluated"
+      "listening": "Included in the whole-set user review; no case-specific verdict supplied."
     },
     {
       "audioSeconds": 3.2043537414965986,
@@ -78,7 +86,7 @@
       "finite": true,
       "sameSampleCount": true,
       "numericalPassed": true,
-      "listening": "not evaluated"
+      "listening": "Included in the whole-set user review; no case-specific verdict supplied."
     },
     {
       "audioSeconds": 3.4249433106575964,
@@ -115,7 +123,7 @@
       "finite": true,
       "sameSampleCount": true,
       "numericalPassed": true,
-      "listening": "not evaluated"
+      "listening": "Included in the whole-set user review; no case-specific verdict supplied."
     },
     {
       "audioSeconds": 3.4017233560090703,
@@ -152,7 +160,7 @@
       "finite": true,
       "sameSampleCount": true,
       "numericalPassed": true,
-      "listening": "not evaluated"
+      "listening": "Included in the whole-set user review; no case-specific verdict supplied."
     },
     {
       "audioSeconds": 3.3668934240362813,
@@ -189,7 +197,7 @@
       "finite": true,
       "sameSampleCount": true,
       "numericalPassed": true,
-      "listening": "not evaluated"
+      "listening": "Included in the whole-set user review; no case-specific verdict supplied."
     },
     {
       "audioSeconds": 3.3668934240362813,
@@ -226,7 +234,7 @@
       "finite": true,
       "sameSampleCount": true,
       "numericalPassed": true,
-      "listening": "not evaluated"
+      "listening": "Included in the whole-set user review; no case-specific verdict supplied."
     },
     {
       "audioSeconds": 3.378503401360544,
@@ -263,7 +271,7 @@
       "finite": true,
       "sameSampleCount": true,
       "numericalPassed": true,
-      "listening": "not evaluated"
+      "listening": "Included in the whole-set user review; no case-specific verdict supplied."
     },
     {
       "audioSeconds": 4.4117913832199545,
@@ -318,7 +326,7 @@
       "finite": true,
       "sameSampleCount": true,
       "numericalPassed": true,
-      "listening": "not evaluated"
+      "listening": "Included in the whole-set user review; no case-specific verdict supplied."
     },
     {
       "audioSeconds": 4.005442176870749,
@@ -391,7 +399,7 @@
       "finite": true,
       "sameSampleCount": true,
       "numericalPassed": true,
-      "listening": "not evaluated"
+      "listening": "Included in the whole-set user review; no case-specific verdict supplied."
     },
     {
       "audioSeconds": 17.356916099773244,
@@ -482,7 +490,7 @@
       "finite": true,
       "sameSampleCount": true,
       "numericalPassed": true,
-      "listening": "not evaluated"
+      "listening": "Included in the whole-set user review; no case-specific verdict supplied."
     },
     {
       "audioSeconds": 0.8126984126984127,
@@ -519,7 +527,7 @@
       "finite": true,
       "sameSampleCount": true,
       "numericalPassed": true,
-      "listening": "not evaluated"
+      "listening": "Included in the whole-set user review; no case-specific verdict supplied."
     }
   ],
   "numericalPassed": true,
