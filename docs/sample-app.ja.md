@@ -19,6 +19,8 @@ Xcodeでの起動とモデルファイルの配置は[クイックスタート](
 
 共通フォルダを選ぶと内部のBERTと辞書を自動認識します。個々の `.mlpackage` を選ぶ操作ではありません。
 サンプルのDocuments直下に上記の名前の2フォルダを置いた場合は、起動時に自動検出します。
+iPhoneでは「ファイル」アプリの **このiPhone内 → SBV2 Core ML** からもDocumentsを開けます。
+この設定は[Info-iOS.plist](../Examples/Apple/Info-iOS.plist)に明示しています。
 
 ## メイン画面の操作
 

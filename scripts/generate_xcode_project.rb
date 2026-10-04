@@ -5,6 +5,7 @@ root = File.expand_path('..', __dir__)
 project = Xcodeproj::Project.new(File.join(root, 'Examples/Apple/SBV2Demo.xcodeproj'))
 source = project.main_group.new_file('SBV2Demo.swift')
 assets = project.main_group.new_file('Assets.xcassets')
+project.main_group.new_file('Info-iOS.plist')
 package = project.new(Xcodeproj::Project::Object::XCLocalSwiftPackageReference)
 package.relative_path = '../..'
 project.root_object.package_references << package
@@ -32,6 +33,7 @@ project.root_object.package_references << package
       'ENABLE_HARDENED_RUNTIME' => 'YES'
     })
     config.build_settings['TARGETED_DEVICE_FAMILY'] = '1,2' if platform == :ios
+    config.build_settings['INFOPLIST_FILE'] = 'Info-iOS.plist' if platform == :ios
     config.build_settings['ARCHS'] = 'arm64' if platform == :osx
   end
   scheme = Xcodeproj::XCScheme.new

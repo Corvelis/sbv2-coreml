@@ -7,9 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0637FB57D85FBEABEE4FA6BF /* SBV2CoreML in Frameworks */ = {isa = PBXBuildFile; productRef = 7ED7569F7282A5DA2CB01315 /* SBV2CoreML */; };
 		0C9E554811E54584B2D1B030 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1A2C8C40DE4440CF97DBB64C /* Assets.xcassets */; };
 		17D33C9B11564CE5A6DDBD17 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1A2C8C40DE4440CF97DBB64C /* Assets.xcassets */; };
-		0637FB57D85FBEABEE4FA6BF /* SBV2CoreML in Frameworks */ = {isa = PBXBuildFile; productRef = 7ED7569F7282A5DA2CB01315 /* SBV2CoreML */; };
 		22D674E470F185AC230EF855 /* SBV2Demo.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEC6BA314B12C69B59024DBE /* SBV2Demo.swift */; };
 		2F7A5BB7589A13FD431A45E6 /* SBV2CoreML in Frameworks */ = {isa = PBXBuildFile; productRef = 44C5C0467AAEF7BBE3A93427 /* SBV2CoreML */; };
 		A427657E193BE417618C9F6E /* SBV2Demo.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEC6BA314B12C69B59024DBE /* SBV2Demo.swift */; };
@@ -21,6 +21,7 @@
 		1A2C8C40DE4440CF97DBB64C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		2EBC6755F5DB14004E54BCA0 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		54A6AC77FA8FC8DF74D5736F /* SBV2Demo-macOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "SBV2Demo-macOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		94ACA21F4243D5292C494892 /* Info-iOS.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Info-iOS.plist"; sourceTree = "<group>"; };
 		B4BBE81AA08D4CA3B50735A0 /* SBV2Demo-iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "SBV2Demo-iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		BD7F063B0A267E765466DCF0 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.0.sdk/System/Library/Frameworks/Cocoa.framework; sourceTree = DEVELOPER_DIR; };
 		BEC6BA314B12C69B59024DBE /* SBV2Demo.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SBV2Demo.swift; sourceTree = "<group>"; };
@@ -55,6 +56,7 @@
 				920A1AADD31B6B40CBCF9CCB /* Frameworks */,
 				BEC6BA314B12C69B59024DBE /* SBV2Demo.swift */,
 				1A2C8C40DE4440CF97DBB64C /* Assets.xcassets */,
+				94ACA21F4243D5292C494892 /* Info-iOS.plist */,
 			);
 			sourceTree = "<group>";
 		};
@@ -298,6 +300,7 @@
 				ENABLE_APP_SANDBOX = NO;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Info-iOS.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "SBV2 Core ML";
 				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
 				INFOPLIST_KEY_UIFileSharingEnabled = YES;
@@ -386,6 +389,7 @@
 				ENABLE_APP_SANDBOX = NO;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Info-iOS.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "SBV2 Core ML";
 				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
 				INFOPLIST_KEY_UIFileSharingEnabled = YES;

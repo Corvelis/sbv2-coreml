@@ -25,6 +25,49 @@ observations, not controlled benchmarks or universal performance guarantees. No 
 was included. Playback completion does not establish perceptual audio quality. Hosted HF
 installation and listening comparisons against the original remain pending.
 
+## Physical iPhone UI operation — 2026-10-04
+
+The current sample was operated with Apple XCUITest on iPhone 17 Pro, iOS 27.0.1
+(24A446), without mirroring or locking. Two independent tests passed with zero failures:
+
+- Default Documents model detection, preparation, Japanese text input, Neutral and Happy
+  synthesis/playback completion, replay, stop, replay completion and regeneration after editing.
+- Manual common-folder selection, BERT/dictionary recognition, separate voice-folder selection,
+  and completed preparation/warm-up from those selected paths.
+
+Model rows now use `contentShape` to accept taps in their empty space. An explicit
+`Info-iOS.plist` fixes file sharing: `UIFileSharingEnabled` was missing from the generated
+app despite the build setting. The key is now present in the built Release app. Both
+distributed Xcode targets also passed Release builds.
+
+See the [UI report](verification/iphone-sample-xcuitest-20261004.json),
+[prepared screen](verification/iphone-sample-prepared-20261004.png),
+[playback screen](verification/iphone-sample-playback-20261004.png) and
+[settings screen](verification/iphone-sample-model-settings-20261004.png).
+These app screenshots were visually inspected. Private Files listings are excluded.
+Earlier automated folder navigation attempts failed; navigation through the parent-folder
+menu completed the manual-selection test. These checks are not statistical speed measurements
+or subjective listening evaluations.
+
+## Natural utterances versus original voice weights — 2026-10-04
+
+The shipped JVNV F1 JP-Extra voice was compared with FP32 PyTorch loaded from the
+original Safetensors. Eleven cases / seventeen segments cover all seven styles,
+long vowels, multiple sentences, a long sentence split at model capacity, and a short greeting.
+The production SDK's phonemes, BERT features and actual random tensors were captured
+with seed `20261004` and passed to the original voice network. This isolates voice
+conversion: the original frontend and BERT were not independently rerun.
+
+Every phoneme duration and output sample count matched. Whole-case SNR was
+46.05–47.01 dB; maximum absolute error was below 0.002573 and correlation exceeded
+0.999988. Final 13-frame errors are also recorded. All cases passed the mixed-precision
+numerical bounds (SNR at least 35 dB, maximum absolute error at most 0.05).
+See the [natural voice report](verification/jvnv-natural-voice-20261004.json).
+
+Original/Core ML WAV pairs without loudness normalization were prepared locally.
+The listening verdict is not yet recorded; numerical checks do not establish perceptual
+equivalence. Concurrent Irodori inference and compilation exclude this run from speed evaluation.
+
 ## Historical sample UI verification before redesign — 2026-10-04
 
 This records the previous UI and playback implementation. See the section above for the current sample.
@@ -39,8 +82,8 @@ The sample displayed stale playback time after completion or stopping. Its statu
 were corrected and verified on Mac. No inference code or model weights changed. Both Release
 targets built successfully; the updated iPhone sample was installed and launched on iPhone 17 Pro.
 
-iPhone UI operation is pending: iPhone Mirroring requires the physical phone to be locked.
-Earlier device synthesis tests do not establish that the current UI checks passed on iPhone.
+iPhone UI operation was pending at that point because mirroring required the phone to be locked.
+The current UI was subsequently checked with XCUITest as recorded above.
 Hosted Hugging Face download checks and listening comparisons against the original remain
 pending. Playback-queue completion does not establish perceptual voice quality.
 Individual observations and remaining checks are recorded in the

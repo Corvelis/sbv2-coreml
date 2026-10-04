@@ -1,0 +1,76 @@
+{
+  "date": "2026-10-04",
+  "device": "iPhone 17 Pro",
+  "os": "27.0.1 (24A446)",
+  "configuration": "Release",
+  "method": "Apple XCUITest; UI buttons, text entry and screenshots. No iPhone Mirroring or lock required.",
+  "model": "JVNV F1 JP-Extra",
+  "playbackMode": "complete utterance, single Float32 buffer",
+  "playbackControls": {
+    "test": "DeviceTests.test02PlaybackControls",
+    "result": "passed",
+    "seconds": 73.698,
+    "failures": 0,
+    "modelInput": "default folders automatically detected in app Documents",
+    "preparationDisplayedSeconds": 25.3,
+    "checks": [
+      "prepare via main button",
+      "edit Japanese text and dismiss keyboard",
+      "Neutral synthesis and playback completion",
+      "RTF displayed",
+      "select Happy through style picker",
+      "Happy synthesis and playback completion",
+      "replay cached audio",
+      "settings disabled during playback",
+      "stop replay",
+      "replay to completion after stop",
+      "edit text and synthesize again after stop"
+    ]
+  },
+  "folderSelection": {
+    "test": "DeviceTests.test04FolderSelection",
+    "result": "passed",
+    "checks": [
+      "open model settings",
+      "select common folder via Files parent-folder menu",
+      "BERT and dictionary detected from common folder",
+      "select separate voice folder",
+      "prepare via main button after both selections",
+      "preparation complete with selected paths"
+    ],
+    "preparationDisplayedSeconds": 23.3,
+    "seconds": 72.249
+  },
+  "fixes": [
+    "Model-selection rows now accept taps across their full width.",
+    "Explicit Info-iOS.plist ensures UIFileSharingEnabled is present in the built app."
+  ],
+  "builds": {
+    "iPhoneRelease": "passed",
+    "MacAppleSiliconRelease": "passed",
+    "builtUIFileSharingEnabled": true
+  },
+  "screenshots": [
+    "iphone-sample-prepared-20261004.png",
+    "iphone-sample-playback-20261004.png",
+    "iphone-sample-model-settings-20261004.png"
+  ],
+  "scope": "UI workflow verification; neither listening comparison nor a controlled performance benchmark.",
+  "runtimeWarnings": [
+    "Audio-session activation on the main thread may affect responsiveness.",
+    "Default QoS thread waited on from interactive QoS.",
+    "Invalid frame dimension warning during the UI test; no layout defect in the inspected screenshots."
+  ],
+  "hostedDownload": "not performed: public URLs not configured",
+  "listening": "pending user verdict",
+  "restoration": {
+    "FilesViewMode": "original Icon Mode restored with a passing XCUITest",
+    "sample": "normal application launched without diagnostic arguments",
+    "Irodori": "device-use completion communicated"
+  },
+  "sourceFiles": {
+    "Examples/Apple/SBV2Demo.swift": "3427a03cf39d3bcb9f0192623673f9332b2fb730ceb79ce3b8569b58cfde0697",
+    "Examples/Apple/Info-iOS.plist": "19be0b9bf113cc64f4cad4637bb81024f8178b0e382e5d307892f8e825d5cb80",
+    "Examples/Apple/SBV2Demo.xcodeproj/project.pbxproj": "94e6ddd50e9782c2a0542a65f5622b025739ff4f61d86cdd67bcd0c25befd358"
+  }
+}

@@ -381,7 +381,7 @@ struct DemoView: View {
                     Image(systemName: "slider.horizontal.3").font(.body.weight(.medium)).frame(width: 38, height: 38)
                 }
                 .buttonStyle(.plain).background(DemoStyle.background, in: Circle())
-                .accessibilityLabel("モデル設定").help("モデル設定").disabled(state.busy)
+                .accessibilityLabel("モデル設定").accessibilityIdentifier("modelSettings").help("モデル設定").disabled(state.busy)
             }.frame(maxWidth: 640).padding(.horizontal, 24).padding(.top, 20).padding(.bottom, 18)
                 .frame(maxWidth: .infinity)
             ScrollView {
@@ -397,7 +397,7 @@ struct DemoView: View {
                                         Text(DemoStyle.names[$0] ?? $0).tag($0)
                                     }
                                 }.labelsHidden().pickerStyle(.menu).disabled(state.busy)
-                                    .accessibilityLabel("スタイル")
+                                    .accessibilityLabel("スタイル").accessibilityIdentifier("voiceStyle")
                             }
                         }
                         if let info = state.info, info.speakers.count > 1 {
@@ -413,7 +413,7 @@ struct DemoView: View {
                             }
                             TextEditor(text: $state.text).font(.body).scrollContentBackground(.hidden)
                                 .frame(minHeight: 220).focused($editing)
-                                .accessibilityLabel("読み上げる文章")
+                                .accessibilityLabel("読み上げる文章").accessibilityIdentifier("speechText")
                         }
                         HStack {
                             Text("端末内で音声を生成します").font(.caption).foregroundStyle(.secondary)
@@ -428,6 +428,7 @@ struct DemoView: View {
                         if state.busy && state.phase != .playing { ProgressView().controlSize(.small) }
                         else { Image(systemName: statusSymbol).foregroundStyle(state.phase == .failed ? Color.orange : DemoStyle.accent) }
                         Text(state.status).font(.subheadline).foregroundStyle(.secondary).textSelection(.enabled)
+                            .accessibilityIdentifier("speechStatus")
                     }.frame(maxWidth: .infinity, alignment: .leading)
                     if state.phase == .playing { ProgressView(value: state.playbackProgress).tint(DemoStyle.accent) }
                     if let metrics = state.metrics {
@@ -449,14 +450,14 @@ struct DemoView: View {
                 } label: {
                     Label(actionTitle, systemImage: state.ready ? "waveform" : "sparkle")
                         .font(.body.weight(.semibold)).frame(maxWidth: .infinity).padding(.vertical, 6)
-                }.buttonStyle(.borderedProminent).tint(DemoStyle.accent).controlSize(.large)
+                }.buttonStyle(.borderedProminent).tint(DemoStyle.accent).controlSize(.large).accessibilityIdentifier("generateSpeech")
                     .disabled(state.busy || (state.ready && state.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty))
                 if state.busy {
                     Button(action: state.stop) { Image(systemName: "stop.fill").frame(width: 24, height: 30) }
-                        .buttonStyle(.bordered).controlSize(.large).accessibilityLabel("停止")
+                        .buttonStyle(.bordered).controlSize(.large).accessibilityLabel("停止").accessibilityIdentifier("stopSpeech")
                 } else if state.canReplay {
                     Button(action: state.replay) { Image(systemName: "arrow.counterclockwise").frame(width: 24, height: 30) }
-                        .buttonStyle(.bordered).controlSize(.large).accessibilityLabel("もう一度再生").help("もう一度再生")
+                        .buttonStyle(.bordered).controlSize(.large).accessibilityLabel("もう一度再生").accessibilityIdentifier("replaySpeech").help("もう一度再生")
                 }
             }.frame(maxWidth: 640).padding(.horizontal, 24).padding(.vertical, 18).frame(maxWidth: .infinity)
                 .background(.bar)
@@ -494,7 +495,7 @@ struct ModelSettings: View {
                     DisclosureGroup("辞書を個別に指定") { folder("日本語辞書", kind: .dictionary, symbol: "book.closed") }
                 }
                 Section {
-                    Button("準備・ウォームアップ", action: state.prepare).disabled(state.busy || state.assets.count != 3)
+                    Button("準備・ウォームアップ", action: state.prepare).accessibilityIdentifier("prepareModels").disabled(state.busy || state.assets.count != 3)
                     Text(state.status).font(.caption).foregroundStyle(.secondary)
                 } footer: {
                     Text("共通フォルダを選ぶとBERTと辞書を自動で読み取ります。初回の準備には時間がかかります。")
@@ -515,7 +516,7 @@ struct ModelSettings: View {
                         .font(.caption).foregroundStyle(.secondary)
                 }
             }.formStyle(.grouped).navigationTitle("モデル設定")
-                .toolbar { ToolbarItem(placement: .confirmationAction) { Button("完了") { dismiss() } } }
+                .toolbar { ToolbarItem(placement: .confirmationAction) { Button("完了") { dismiss() }.accessibilityIdentifier("closeModelSettings") } }
         }
         .tint(DemoStyle.accent)
         .fileImporter(isPresented: $importing, allowedContentTypes: [.folder]) { result in
@@ -536,7 +537,7 @@ struct ModelSettings: View {
                 }
                 Spacer()
                 Image(systemName: "folder").foregroundStyle(.secondary)
-            }.padding(.vertical, 5)
-        }.buttonStyle(.plain).disabled(state.busy)
+            }.padding(.vertical, 5).contentShape(Rectangle())
+        }.buttonStyle(.plain).accessibilityIdentifier("choose-\(kind.rawValue.lowercased())").disabled(state.busy)
     }
 }
