@@ -14,7 +14,7 @@ Inference runs on-device through Core ML. Python and ONNX Runtime are not requir
   and the [JVNV voice](https://huggingface.co/AILogDev/sbv2-coreml-jvnv-f1-jp).
   Model weights are downloaded separately from the source/SDK.
 
-[Source downloads](https://github.com/Corvelis/sbv2-coreml/releases/tag/v0.1.0-dev4) ·
+[Source downloads](https://github.com/Corvelis/sbv2-coreml/releases/tag/v0.1.0-dev5) ·
 [Quick Start](docs/getting-started.ja.md) · [SDK guide](docs/sdk-guide.ja.md) ·
 [Sample app](docs/sample-app.ja.md) · [API reference](docs/api-reference.ja.md) ·
 [Troubleshooting](docs/troubleshooting.ja.md)
@@ -22,7 +22,7 @@ Inference runs on-device through Core ML. Python and ONNX Runtime are not requir
 ## Add the SDK
 
 In Xcode, select **File → Add Package Dependencies**, enter
-`https://github.com/Corvelis/sbv2-coreml.git`, choose **Exact Version: 0.1.0-dev4**,
+`https://github.com/Corvelis/sbv2-coreml.git`, choose **Exact Version: 0.1.0-dev5**,
 and add the **SBV2CoreML** product to your app.
 
 ```swift
@@ -87,6 +87,14 @@ Supported inputs: AivisHub URLs, AIVM, or Safetensors with config/style vectors.
 Compatible voices reuse the shared BERT/dictionary.
 ONNX/AIVMX-only inputs, standard SBV2 and multilingual profiles are not supported.
 [Conversion guide](docs/conversion.md) · [Model format](docs/model-format.md)
+
+## Reduce the shared model size
+
+`compress-common` stores shared BERT weights in 8bit or FP16. Your voice model stays separate.
+The default shared model uses 8bit storage: approximately 797 MB including JVNV, versus 1.81 GB with FP32 BERT, a 56% reduction.
+The first BERT prediction takes longer; call `load` and `warmUp` during preparation.
+Check audio quality and speed with your voices, texts and devices before adoption.
+[Compression guide](docs/compression.md)
 
 ## Licenses
 

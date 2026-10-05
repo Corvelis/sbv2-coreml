@@ -11,7 +11,7 @@ SDK、共通モデル、声モデルは別の配布物です。Swift Packageを�
 
 1. iOSまたはmacOSのアプリプロジェクトを開く。
 2. Deployment TargetをiOS 18以上、またはmacOS 15以上にする。Macの対象はApple Siliconです。
-3. **File → Add Package Dependencies**で`https://github.com/Corvelis/sbv2-coreml.git`を指定し、**Exact Version: 0.1.0-dev4**を選ぶ。
+3. **File → Add Package Dependencies**で`https://github.com/Corvelis/sbv2-coreml.git`を指定し、**Exact Version: 0.1.0-dev5**を選ぶ。
 4. Package Product **SBV2CoreML**をアプリのターゲットへ追加する。CLI用の`sbv2-say`をリンクする必要はありません。
 5. アプリのSwiftファイルに`import SBV2CoreML`を書く。
 

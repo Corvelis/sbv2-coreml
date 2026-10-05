@@ -15,6 +15,7 @@ Style-Bert-VITS2 JP-ExtraをiPhone／Apple Silicon Macで使うためのSDK、�
 | メソッド、引数、停止処理を調べる | [Swift APIリファレンス](api-reference.ja.md) |
 | AivisHubや自作モデルの声を使う | [変換ガイド・CLIリファレンス](conversion.ja.md) |
 | モデルの構造、保存場所、サイズを調べる | [モデル仕様](model-format.ja.md) |
+| 共通モデルのBERTを圧縮する | [容量削減](compression.ja.md) |
 | 初期化失敗、遅延、容量、音切れを調べる | [トラブルシューティング](troubleshooting.ja.md) |
 | コードやモデルを再配布する | [ライセンスと出典](licenses.ja.md) |
 
@@ -22,8 +23,8 @@ Style-Bert-VITS2 JP-ExtraをiPhone／Apple Silicon Macで使うためのSDK、�
 
 | 配布物 | 内容 | 入手・配置 |
 |---|---|---|
-| SDKとサンプル | Swift Package、iPhone／Macアプリ、WAV出力CLI、Python変換ツール | [Corvelis/sbv2-coreml・v0.1.0-dev4](https://github.com/Corvelis/sbv2-coreml/tree/v0.1.0-dev4)／ソースZIP |
-| 共通モデル | 日本語BERTとOpen JTalk辞書、約1.52 GB | [AILogDev/sbv2-coreml-common](https://huggingface.co/AILogDev/sbv2-coreml-common) |
+| SDKとサンプル | Swift Package、iPhone／Macアプリ、WAV出力CLI、Python変換ツール | [Corvelis/sbv2-coreml・v0.1.0-dev5](https://github.com/Corvelis/sbv2-coreml/tree/v0.1.0-dev5)／ソースZIP |
+| 共通モデル | 日本語BERTとOpen JTalk辞書、約503 MB | [AILogDev/sbv2-coreml-common](https://huggingface.co/AILogDev/sbv2-coreml-common) |
 | サンプルの声 | JVNV F1 JP-Extra、約294 MB | [AILogDev/sbv2-coreml-jvnv-f1-jp](https://huggingface.co/AILogDev/sbv2-coreml-jvnv-f1-jp) |
 
 容量は展開後の配布ファイルの概算です。ダウンロード一時ファイルとCore MLのコンパイルキャッシュは別途必要です。

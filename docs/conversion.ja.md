@@ -2,6 +2,8 @@
 
 [ドキュメント一覧](README.ja.md) · [English](conversion.md)
 
+取得済み共通BERTの容量削減は[容量削減の手順](compression.ja.md)を参照してください。
+
 声モデルの変換はApple Silicon Mac、Python 3.11で行います。
 互換性のある声を追加する場合、共通BERTを毎回変換する必要はありません。
 対応は[モデル仕様](model-format.ja.md)に記載した日本語JP-Extraです。

@@ -25,8 +25,8 @@ Core MLで推論し、iPhone／Mac用サンプルアプリ、WAV出力CLI、声�
 
 | 配布物 | 入手先 |
 |---|---|
-| SDK・サンプルアプリ・変換ツール | [GitHub Releases](https://github.com/Corvelis/sbv2-coreml/releases/tag/v0.1.0-dev4) |
-| 共通BERT・Open JTalk辞書（約1.52 GB） | [AILogDev/sbv2-coreml-common](https://huggingface.co/AILogDev/sbv2-coreml-common) |
+| SDK・サンプルアプリ・変換ツール | [GitHub Releases](https://github.com/Corvelis/sbv2-coreml/releases/tag/v0.1.0-dev5) |
+| 共通BERT・Open JTalk辞書（約503 MB） | [AILogDev/sbv2-coreml-common](https://huggingface.co/AILogDev/sbv2-coreml-common) |
 | JVNV F1 JP-Extraの声モデル（約294 MB） | [AILogDev/sbv2-coreml-jvnv-f1-jp](https://huggingface.co/AILogDev/sbv2-coreml-jvnv-f1-jp) |
 
 SDK・ソースZIPにモデルの重みは含まれていません。取得方法は[クイックスタート](docs/getting-started.ja.md)を参照してください。
@@ -35,7 +35,7 @@ SDK・ソースZIPにモデルの重みは含まれていません。取得方�
 ## XcodeへSDKを追加する
 
 1. **File → Add Package Dependencies**で、次のURLを指定します。
-2. **Exact Version: 0.1.0-dev4**を選びます。
+2. **Exact Version: 0.1.0-dev5**を選びます。
 3. アプリのターゲットへ **SBV2CoreML** を追加します。
 
 ```text
@@ -109,6 +109,14 @@ AivisHubのURL、AIVM、またはSafetensors・設定・スタイルベクトル
 
 対応するのは[モデル仕様](docs/model-format.ja.md)に記載した日本語JP-Extraモデルです。
 ONNX／AIVMXだけを入力した変換、通常版SBV2、多言語版は対象外です。
+
+## 共通モデルの容量を減らす
+
+`compress-common`で共通BERTの重みを8bitまたはFP16で保存できます。声モデルは別のまま使用します。
+通常配布の共通モデルは8bit版です。JVNVの声と合わせて約797 MBで、FP32版の約1.81 GBから約56%小さくなっています。
+モデル読み込み後の最初のBERT実行は長くなるため、`load`と`warmUp`を準備時に実行してください。
+生成したモデルは、使う声・文章・端末で音質と速度を確認してから採用してください。
+[容量削減の手順](docs/compression.ja.md)
 
 ## ライセンス
 

@@ -7,11 +7,11 @@
 
 ## 1. ソースを取得する
 
-[ReleaseのソースZIP](https://github.com/Corvelis/sbv2-coreml/releases/tag/v0.1.0-dev4)をダウンロードして展開します。
+[ReleaseのソースZIP](https://github.com/Corvelis/sbv2-coreml/releases/tag/v0.1.0-dev5)をダウンロードして展開します。
 Gitを使う場合は次のコマンドでも取得できます。
 
 ```sh
-git clone --branch v0.1.0-dev4 https://github.com/Corvelis/sbv2-coreml.git
+git clone --branch v0.1.0-dev5 https://github.com/Corvelis/sbv2-coreml.git
 cd sbv2-coreml
 ```
 
@@ -38,7 +38,7 @@ SDKを自分のアプリへ組み込む場合は[SDK導入ガイド](sdk-guide.j
 
 | モデル | 内容 | 配布ファイルの容量 |
 |---|---|---|
-| [共通モデル](https://huggingface.co/AILogDev/sbv2-coreml-common) | BERT・Open JTalk辞書 | 約1.52 GB |
+| [共通モデル](https://huggingface.co/AILogDev/sbv2-coreml-common) | BERT・Open JTalk辞書 | 約503 MB |
 | [JVNV F1 JP-Extra](https://huggingface.co/AILogDev/sbv2-coreml-jvnv-f1-jp) | 声モデル | 約294 MB |
 
 ダウンロードと初回コンパイルには、上記の容量に加えて空き容量が必要です。

@@ -2,6 +2,8 @@
 
 [日本語](conversion.ja.md) · [Documentation index](README.ja.md)
 
+For weight compression of an already downloaded common model, see the [compression guide](compression.md).
+
 Use macOS on Apple Silicon and Python 3.11. Install `converter[convert]` using the
 constraints in `converter/requirements-lock-macos-arm64.txt`; run `sbv2-coreml doctor`.
 

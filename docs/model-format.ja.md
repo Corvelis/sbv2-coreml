@@ -11,8 +11,8 @@
 sbv2-coreml-common/
   bert/vocab.txt
   bert/coreml_blocks/coreml_bert_blocks_manifest.json
-  bert/coreml_blocks/prefix.0_enum.mlpackage/
-  bert/coreml_blocks/group.1-23-conv_enum.mlpackage/
+  bert/coreml_blocks/prefix.0_enum-int8-b32.mlpackage/
+  bert/coreml_blocks/group.1-23-conv_enum-int8-b32.mlpackage/
   dictionary/{char.bin,dicrc,matrix.bin,sys.dic,unk.dic,COPYING,...}
 sbv2-coreml-jvnv-f1-jp/
   config.json
@@ -21,7 +21,10 @@ sbv2-coreml-jvnv-f1-jp/
   coreml_voice/voice_shared.mlpackage/
 ```
 
-共通パッケージは約1.52 GB、JVNVの声は約294 MBです。これは展開後の配布ファイルで、RAMやコンパイル後のサイズではありません。
+共通パッケージは約503 MB、JVNVの声は約294 MBです。これは展開後の配布ファイルで、RAMやコンパイル後のサイズではありません。
+
+共通BERTの通常配布版は8bit重み保存・FP32演算のモデルです。
+元のFP32版と、FP16保存版を作る方法は[容量削減の手順](compression.ja.md)に記載しています。
 
 ## 対応構造と上限
 

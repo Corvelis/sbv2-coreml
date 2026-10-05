@@ -9,9 +9,9 @@ include `model.json`, `provenance.json`, `LICENSE.md`, `checksums.json`, and `do
 common/
   bert/vocab.txt
   bert/coreml_blocks/coreml_bert_blocks_manifest.json
-  bert/coreml_blocks/prefix.0_enum.mlpackage/
-  bert/coreml_blocks/group.1-23-conv_enum.mlpackage/
-  dictionary/{char.bin,dicrc,matrix.bin,sys.dic,unk.dic,COPYING}
+  bert/coreml_blocks/prefix.0_enum-int8-b32.mlpackage/
+  bert/coreml_blocks/group.1-23-conv_enum-int8-b32.mlpackage/
+  dictionary/{char.bin,matrix.bin,sys.dic,unk.dic,COPYING}
 voice/
   config.json
   style_vectors.npy

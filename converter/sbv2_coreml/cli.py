@@ -157,6 +157,81 @@ def build_bert(args):
         result.rename(args.output)
     print(f'BERT ready: {args.output}')
 
+def compress_common(args):
+    if platform.system() != 'Darwin': raise ValueError('Model compression requires macOS')
+    source = args.input.resolve(); destination = args.output.resolve()
+    if destination.exists(): raise ValueError('Output already exists; choose a new directory')
+    if destination.is_relative_to(source): raise ValueError('Output must be outside the input directory')
+    verify(source)
+    info = json.loads((source / 'model.json').read_text())
+    if info.get('kind') != 'common' or info.get('shared_bert') != 'deberta-v2-large-japanese-char-wwm-coreml-v1':
+        raise ValueError('Expected the shared SBV2 Core ML common model')
+    checksums = json.loads((source / 'checksums.json').read_text())
+    if not {'model.json', 'provenance.json', 'LICENSE.md'}.issubset(checksums):
+        raise ValueError('Input license and provenance must be covered by checksums.json')
+    if info.get('bert_directory') != 'bert' or info.get('dictionary_directory') != 'dictionary':
+        raise ValueError('Expected bert and dictionary directories')
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(prefix='.sbv2-compress-', dir=destination.parent) as temporary:
+        result = Path(temporary) / destination.name; result.mkdir()
+        for name in checksums:
+            if name.startswith('bert/') or name in ('model.json', 'provenance.json', 'download.json'):
+                continue
+            # Compiled platform caches are never part of portable model bundles.
+            if any(part.endswith('.mlmodelc') for part in Path(name).parts): continue
+            if name in ('README.md', 'README.en.md'): name_out = 'source-model-card' + ('.en.md' if name == 'README.en.md' else '.md')
+            else: name_out = name
+            path = result / name_out; path.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(source / name, path)
+        worker('sbv2_coreml.compression', '--input', source / 'bert', '--output', result / 'bert', '--mode', args.mode)
+        info.update(name=destination.name, bert_weight_storage=args.mode, bert_compute_precision='float32')
+        write_json(result / 'model.json', info)
+        provenance = json.loads((source / 'provenance.json').read_text())
+        provenance['weight_compression'] = {'component': 'bert', 'mode': args.mode,
+            'source_checksums_sha256': digest(source / 'checksums.json'), 'converter_version': __version__,
+            'compute_precision': 'float32', 'voice_weights_changed': False}
+        if 'conversion' in provenance: provenance['source_conversion'] = provenance.pop('conversion')
+        provenance['conversion'] = 'BERT weight storage compression; FP32 computation retained'
+        write_json(result / 'provenance.json', provenance)
+        mode_label = '8bit / block 32' if args.mode == 'int8' else 'FP16 weight storage'
+        write_json(result / 'compression.json', {'component': 'bert', 'mode': args.mode,
+            'compute_precision': 'float32', 'perceptual_quality_validated': False})
+        (result / 'README.md').write_text(f'''[English](README.en.md)
+
+# {destination.name}
+
+Style-Bert-VITS2 JP-Extra SDK用の共通BERT・日本語辞書です。
+BERTの重みを{mode_label}で保存し、計算はFP32を維持します。声モデルは別途用意してください。
+
+サンプルアプリの「モデル設定」で、このフォルダをBERTとして選択すると辞書も設定されます。
+SDKには`bert`、`dictionary`と、別の声モデルフォルダを渡します。
+
+圧縮前とは数値が変わります。採用前に、使う声・文章・端末で音質と速度を確認してください。
+元モデルの出典・利用条件は`LICENSE.md`、`provenance.json`、`source-model-card.md`を参照してください。
+辞書の利用条件は`dictionary/COPYING`にあります。
+''', encoding='utf-8')
+        (result / 'README.en.md').write_text(f'''[日本語](README.md)
+
+# {destination.name}
+
+Shared BERT and Japanese dictionary for the Style-Bert-VITS2 JP-Extra SDK.
+BERT weights use {mode_label}; computation remains FP32. Supply a separate voice model.
+
+Select this folder as BERT in the sample app's model settings. The dictionary is detected automatically.
+For the SDK, pass the `bert` and `dictionary` subfolders alongside your voice folder.
+
+Compression changes numerical results. Check audio quality and speed with your voices, texts and devices before adoption.
+See `LICENSE.md`, `provenance.json`, `source-model-card.en.md` and `dictionary/COPYING` for attribution and terms.
+''', encoding='utf-8')
+        files = sorted(p for p in result.rglob('*') if p.is_file())
+        write_json(result / 'checksums.json', {str(p.relative_to(result)): digest(p) for p in files})
+        write_json(result / 'download.json', {'formatVersion': 1, 'name': destination.name,
+            'files': [{'path': str(p.relative_to(result)), 'sha256': digest(p), 'bytes': p.stat().st_size}
+                      for p in [*files, result / 'checksums.json']]})
+        verify(result)
+        result.rename(destination)
+    print(f'Compressed common model ready: {destination}')
+
 def main():
     parser = argparse.ArgumentParser(description='Convert JP-Extra voices for iPhone and Apple Silicon Mac')
     parser.add_argument('--version', action='version', version=__version__)
@@ -165,6 +240,11 @@ def main():
     bert = commands.add_parser('build-bert', help='Rebuild the shared BERT from a local HF checkpoint')
     bert.add_argument('--checkpoint-dir', type=Path, required=True)
     bert.add_argument('--output', type=Path, required=True); bert.set_defaults(run=build_bert)
+    compress = commands.add_parser('compress-common', help='Compress shared BERT weights; keep voice models separate')
+    compress.add_argument('--input', type=Path, required=True)
+    compress.add_argument('--output', type=Path, required=True)
+    compress.add_argument('--mode', choices=['int8', 'fp16-weights'], default='int8')
+    compress.set_defaults(run=compress_common)
     inspect = commands.add_parser('inspect-hub', help='Inspect available original weights and license without downloading weights')
     inspect.add_argument('url'); inspect.set_defaults(run=lambda args: print(json.dumps(aivis_metadata(args.url)[2], indent=2, ensure_ascii=False)))
     convert_parser = commands.add_parser('convert')
