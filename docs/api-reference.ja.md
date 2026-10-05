@@ -15,7 +15,7 @@
 |---|---|
 | `bert` | `vocab.txt`と`coreml_blocks/`がある場所 |
 | `voice` | `config.json`、`style_vectors.npy`、`coreml_voice/`がある場所 |
-| `dictionary` | `sys.dic`、`char.bin`、`matrix.bin`、`unk.dic`、`dicrc`がある場所 |
+| `dictionary` | `sys.dic`、`char.bin`、`matrix.bin`、`unk.dic`がある場所 |
 
 URLはローカル用です。BERTのキャッシュ作成先にも書き込めることが必要です。
 

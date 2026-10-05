@@ -6,11 +6,13 @@
 Keep using your separate voice model. No retraining or original BERT checkpoint is required.
 Use macOS and the converter's `convert` dependencies; see [conversion](conversion.md) for installation.
 
-The default shared model is already compressed to 8bit. To create your own variants, download the original FP32 version:
+Prebuilt INT8 and original FP32 models do not require conversion. See [model selection](model-selection.md) for downloads, trade-offs and switching.
+To create your own variants, download the original FP32 version:
 
 ```sh
-hf download AILogDev/sbv2-coreml-common --revision fp32-v1 \
-  --local-dir ./sbv2-coreml-common-fp32
+hf download AILogDev/sbv2-coreml-common \
+  --revision 973d6e239af305f0d78a8bf30c6af5093c0fd47d \
+  --include "float32/*" --local-dir models
 ```
 
 ## Size and speed
@@ -27,19 +29,19 @@ Initial compilation is an additional cost. Retain a prepared synthesizer for rep
 
 ```sh
 .venv/bin/sbv2-coreml compress-common \
-  --input ./sbv2-coreml-common-fp32 \
-  --output ./sbv2-coreml-common-int8 \
+  --input models/float32 \
+  --output models/my-common-int8 \
   --mode int8
-.venv/bin/sbv2-coreml verify ./sbv2-coreml-common-int8
+.venv/bin/sbv2-coreml verify models/my-common-int8
 ```
 
 The `int8` mode stores weights with symmetric 8bit quantization in blocks of 32 elements.
 Computation and tensor interfaces remain FP32. Supply the original uncompressed common model and a new output folder.
 
-For smaller numerical differences, use `--mode fp16-weights`. This stores large weights in FP16 and casts them back to FP32 for computation.
+An FP16 weight-storage model is not distributed; you can create one with `--mode fp16-weights` for smaller numerical differences. This stores large weights in FP16 and casts them back to FP32 for computation.
 It uses more storage than the 8bit option and can change runtime speed.
 
-In the sample app's model settings, select the new common folder as BERT. Its dictionary is detected automatically.
+In the sample app's **モデル設定 → 共通モデル**, select the new shared root folder. Its dictionary is detected automatically.
 For the SDK, set `ModelPaths.bert` and `ModelPaths.dictionary` to its subfolders and retain your voice folder.
 
 Rounding BERT weights can change pronunciation, timing and waveform even when voice weights are unchanged.

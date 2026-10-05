@@ -13,6 +13,7 @@ Core MLで推論し、iPhone／Mac用サンプルアプリ、WAV出力CLI、声�
 | サンプルアプリで音声を出す | [クイックスタート](docs/getting-started.ja.md) |
 | 自分のXcodeアプリへSDKを組み込む | [SDK導入ガイド](docs/sdk-guide.ja.md) |
 | サンプルの設定・再生操作を調べる | [サンプルアプリの使い方](docs/sample-app.ja.md) |
+| INT8版と元のFP32版を選ぶ・切り替える | [共通モデルの選び方](docs/model-selection.ja.md) |
 | AivisHubや自作モデルの声を変換する | [モデル変換ガイド](docs/conversion.ja.md) |
 | メソッド・引数を調べる | [APIリファレンス](docs/api-reference.ja.md) |
 | モデルが読み込めない・音が出ない | [トラブルシューティング](docs/troubleshooting.ja.md) |
@@ -25,8 +26,8 @@ Core MLで推論し、iPhone／Mac用サンプルアプリ、WAV出力CLI、声�
 
 | 配布物 | 入手先 |
 |---|---|
-| SDK・サンプルアプリ・変換ツール | [GitHub Releases](https://github.com/Corvelis/sbv2-coreml/releases/tag/v0.1.0-dev5) |
-| 共通BERT・Open JTalk辞書（約503 MB） | [AILogDev/sbv2-coreml-common](https://huggingface.co/AILogDev/sbv2-coreml-common) |
+| SDK・サンプルアプリ・変換ツール | [GitHub](https://github.com/Corvelis/sbv2-coreml) |
+| 共通BERT・Open JTalk辞書（INT8版：約503 MB） | [AILogDev/sbv2-coreml-common](https://huggingface.co/AILogDev/sbv2-coreml-common) |
 | JVNV F1 JP-Extraの声モデル（約294 MB） | [AILogDev/sbv2-coreml-jvnv-f1-jp](https://huggingface.co/AILogDev/sbv2-coreml-jvnv-f1-jp) |
 
 SDK・ソースZIPにモデルの重みは含まれていません。取得方法は[クイックスタート](docs/getting-started.ja.md)を参照してください。
@@ -72,7 +73,8 @@ func renderSample(common: URL, voice: URL) async throws -> Data {
 `Examples/Apple/SBV2Demo.xcodeproj`をXcodeで開きます。
 
 1. `SBV2Demo-iOS`または`SBV2Demo-macOS`を選びます。iPhoneでは自分のTeamと固有のBundle Identifierを設定します。
-2. **モデル設定**で**共通モデル**と**声モデル**のフォルダを選びます。辞書は共通フォルダから自動認識します。
+2. **モデル設定 → URLからモデルを取得**で**共通モデルの版**をINT8／FP32から選び、モデルを取得します。声モデルの取得URLも設定できます。
+   取得済みなら**共通モデル**と**声モデル**のフォルダを選びます。辞書は共通フォルダから自動認識します。
 3. **モデルを準備**を押し、準備完了後に文章を入力して**生成して再生**を押します。
 
 全文を合成してから再生します。スタイル変更、停止、生成済み音声の再再生にも対応しています。
@@ -82,12 +84,13 @@ func renderSample(common: URL, voice: URL) async throws -> Data {
 
 リポジトリのルートで、次のように実行します。
 モデルを`models/`へ取得する手順は[クイックスタート](docs/getting-started.ja.md)に記載しています。
+下の例はINT8版です。FP32版では`int8`を`float32`へ置き換えます。
 
 ```sh
 swift run -c release sbv2-say \
-  models/sbv2-coreml-common/bert \
+  models/int8/bert \
   models/sbv2-coreml-jvnv-f1-jp \
-  models/sbv2-coreml-common/dictionary \
+  models/int8/dictionary \
   output.wav "こんにちは。今日はいい天気ですね。"
 afplay output.wav
 ```
@@ -110,13 +113,21 @@ AivisHubのURL、AIVM、またはSafetensors・設定・スタイルベクトル
 対応するのは[モデル仕様](docs/model-format.ja.md)に記載した日本語JP-Extraモデルです。
 ONNX／AIVMXだけを入力した変換、通常版SBV2、多言語版は対象外です。
 
-## 共通モデルの容量を減らす
+## INT8版と元のFP32版を選ぶ
 
-`compress-common`で共通BERTの重みを8bitまたはFP16で保存できます。声モデルは別のまま使用します。
-通常配布の共通モデルは8bit版です。JVNVの声と合わせて約797 MBで、FP32版の約1.81 GBから約56%小さくなっています。
-モデル読み込み後の最初のBERT実行は長くなるため、`load`と`warmUp`を準備時に実行してください。
-生成したモデルは、使う声・文章・端末で音質と速度を確認してから採用してください。
-[容量削減の手順](docs/compression.ja.md)
+共通モデルは2種類を配布しています。同じSDKと声モデルを使えます。
+
+| 版 | 共通BERT・辞書 | JVNV込み | 選ぶ目安 |
+|---|---:|---:|---|
+| INT8（`int8/`） | 約503 MB | 約797 MB | ファイル容量を抑えたい |
+| 元のFP32（`float32/`） | 約1.52 GB | 約1.81 GB | 重み量子化による数値差を避けたい、準備時間を短くしたい |
+
+INT8化はBERTの重み保存だけに適用し、BERTの演算・入出力はFP32です。
+声モデルは変更しませんが、BERTの特徴量が変わることで抑揚や音声の長さに差が生じる場合があります。
+INT8版は読み込み後の準備時間が長く、必ずしも合成が速くなるわけではありません。
+[両方の取得URL・切り替え方・性能比較](docs/model-selection.ja.md)
+
+自分で共通BERTを圧縮するための`compress-common`も含みます。[容量削減の手順](docs/compression.ja.md)
 
 ## ライセンス
 

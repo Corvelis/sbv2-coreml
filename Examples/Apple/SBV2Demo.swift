@@ -54,6 +54,19 @@ import SBV2CoreML
 
 @MainActor final class DemoState: ObservableObject {
     enum Asset: String, CaseIterable, Identifiable { case bert = "BERT", voice = "Voice", dictionary = "Dictionary"; var id: String { rawValue } }
+    enum CommonDownload: String, CaseIterable, Identifiable {
+        case int8 = "INT8（約503 MB）", float32 = "FP32（約1.52 GB）", custom = "カスタムURL"
+        var id: String { rawValue }
+        var manifestURL: String {
+            let base = "https://huggingface.co/AILogDev/sbv2-coreml-common/resolve/973d6e239af305f0d78a8bf30c6af5093c0fd47d"
+            switch self {
+            case .int8: return base + "/int8/download.json"
+            case .float32: return base + "/float32/download.json"
+            case .custom: return ""
+            }
+        }
+    }
+    private static let sampleVoiceURL = "https://huggingface.co/AILogDev/sbv2-coreml-jvnv-f1-jp/resolve/17faac326f120b171170f10807bb26b0da8257d9/download.json"
     enum Phase: Equatable { case idle, preparing, generating, playing, downloading, ready, failed }
     struct Metrics {
         let synthesisSeconds: Double
@@ -72,14 +85,30 @@ import SBV2CoreML
     @Published var assets: [Asset: URL] = [:]
     @Published var busy = false
     @Published var ready = false
-    @Published var downloadURL = ""
-    @Published var downloadKind: Asset = .voice
+    @Published var downloadURL = CommonDownload.int8.manifestURL
+    @Published var downloadKind: Asset = .bert
+    @Published var commonDownload: CommonDownload = .int8
     private let synthesizer = SpeechSynthesizer()
     private let player = AudioPlayer()
     private var lastAudio: SpeechChunk?
     private var timing: [String: Double] = [:]
     var canReplay: Bool { lastAudio != nil && !busy }
     var voiceName: String { info?.speakers.keys.sorted().first ?? "声モデルを選択" }
+    var commonModelLabel: String {
+        guard let bert = assets[.bert] else { return "未選択" }
+        let root = bert.lastPathComponent == "bert" ? bert.deletingLastPathComponent() : bert
+        guard let data = try? Data(contentsOf: root.appendingPathComponent("model.json")),
+              let model = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any],
+              model["kind"] as? String == "common" else { return root.lastPathComponent }
+        let precision: String
+        switch model["bert_weight_storage"] as? String {
+        case "int8": precision = "INT8"
+        case "float32", nil: precision = "FP32"
+        case "fp16-weights": precision = "FP16保存"
+        default: precision = "カスタム"
+        }
+        return "\(precision) · \(root.lastPathComponent)"
+    }
     private var task: Task<Void, Never>?
     private var scopedURLs: [URL] = []
     private var generation = 0
@@ -190,6 +219,20 @@ import SBV2CoreML
     func stop() {
         generation += 1; task?.cancel(); task = nil; synthesizer.cancel(); player.stop(); busy = false
         playbackProgress = 0; phase = ready ? .ready : .idle; status = "停止しました。"
+    }
+    func chooseDownloadKind(_ kind: Asset) {
+        downloadKind = kind
+        downloadURL = kind == .bert ? commonDownload.manifestURL : Self.sampleVoiceURL
+    }
+    func chooseCommonDownload(_ preset: CommonDownload) {
+        commonDownload = preset
+        downloadURL = preset.manifestURL
+    }
+    func editDownloadURL(_ value: String) {
+        downloadURL = value
+        if downloadKind == .bert {
+            commonDownload = CommonDownload.allCases.first { $0.manifestURL == value } ?? .custom
+        }
     }
     func download() {
         guard let url = URL(string: downloadURL), url.scheme == "https" else { status = "HTTPSのdownload.json URLを入力してください。"; return }
@@ -502,12 +545,21 @@ struct ModelSettings: View {
                 }
                 Section {
                     DisclosureGroup("URLからモデルを取得") {
-                        Picker("取得するモデル", selection: $state.downloadKind) {
+                        Picker("取得するモデル", selection: Binding(get: { state.downloadKind }, set: state.chooseDownloadKind)) {
                             Text("共通モデル").tag(DemoState.Asset.bert)
                             Text("声モデル").tag(DemoState.Asset.voice)
+                        }.disabled(state.busy)
+                        if state.downloadKind == .bert {
+                            Picker("共通モデルの版", selection: Binding(get: { state.commonDownload }, set: state.chooseCommonDownload)) {
+                                ForEach(DemoState.CommonDownload.allCases) { preset in Text(preset.rawValue).tag(preset) }
+                            }.accessibilityIdentifier("commonDownloadVariant").disabled(state.busy)
+                            Text("INT8は容量を抑えられます。FP32は量子化前の重みです。INT8は最初の準備に時間がかかる場合があります。")
+                                .font(.caption).foregroundStyle(.secondary)
                         }
-                        TextField("download.json のHTTPS URL", text: $state.downloadURL).textFieldStyle(.roundedBorder)
-                        Button("ダウンロード", action: state.download).disabled(state.busy)
+                        TextField("download.json のHTTPS URL", text: Binding(get: { state.downloadURL }, set: state.editDownloadURL))
+                            .textFieldStyle(.roundedBorder).accessibilityIdentifier("modelManifestURL").disabled(state.busy)
+                        Button("ダウンロード", action: state.download).accessibilityIdentifier("downloadModel")
+                            .disabled(state.busy || state.downloadURL.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                     }
                 }
                 Section {
@@ -533,7 +585,8 @@ struct ModelSettings: View {
                 Image(systemName: symbol).frame(width: 24).foregroundStyle(DemoStyle.accent)
                 VStack(alignment: .leading, spacing: 4) {
                     Text(title).foregroundStyle(.primary)
-                    Text(state.assets[kind]?.lastPathComponent ?? "未選択").font(.caption).foregroundStyle(.secondary).lineLimit(1)
+                    Text(kind == .bert ? state.commonModelLabel : state.assets[kind]?.lastPathComponent ?? "未選択")
+                        .font(.caption).foregroundStyle(.secondary).lineLimit(1)
                 }
                 Spacer()
                 Image(systemName: "folder").foregroundStyle(.secondary)

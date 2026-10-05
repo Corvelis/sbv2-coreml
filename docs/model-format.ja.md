@@ -8,12 +8,12 @@
 別のキャラクターの重みの一部分だけを混ぜず、変換した声パッケージ全体を交換します。
 
 ```text
-sbv2-coreml-common/
+int8/
   bert/vocab.txt
   bert/coreml_blocks/coreml_bert_blocks_manifest.json
   bert/coreml_blocks/prefix.0_enum-int8-b32.mlpackage/
   bert/coreml_blocks/group.1-23-conv_enum-int8-b32.mlpackage/
-  dictionary/{char.bin,dicrc,matrix.bin,sys.dic,unk.dic,COPYING,...}
+  dictionary/{char.bin,matrix.bin,sys.dic,unk.dic,COPYING,...}
 sbv2-coreml-jvnv-f1-jp/
   config.json
   style_vectors.npy
@@ -21,10 +21,12 @@ sbv2-coreml-jvnv-f1-jp/
   coreml_voice/voice_shared.mlpackage/
 ```
 
-共通パッケージは約503 MB、JVNVの声は約294 MBです。これは展開後の配布ファイルで、RAMやコンパイル後のサイズではありません。
+共通パッケージはINT8版で約503 MB、元のFP32版で約1.52 GB、JVNVの声は約294 MBです。これは展開後の配布ファイルで、RAMやコンパイル後のサイズではありません。
 
-共通BERTの通常配布版は8bit重み保存・FP32演算のモデルです。
-元のFP32版と、FP16保存版を作る方法は[容量削減の手順](compression.ja.md)に記載しています。
+共通BERTには`int8/`（8bit重み保存）と`float32/`（元のFP32重み）があります。BERTの演算と入出力は両方でFP32です。
+両方の取得先と使い分けは[共通モデルの選び方](model-selection.ja.md)、自分で圧縮する方法は[容量削減の手順](compression.ja.md)を参照してください。
+上のフォルダ構成はINT8版です。元のFP32版は`prefix.0_enum.mlpackage`と`group.1-23-conv_enum.mlpackage`を使います。
+SDKは各版の`coreml_bert_blocks_manifest.json`からファイルを読み込みます。
 
 ## 対応構造と上限
 

@@ -7,11 +7,11 @@
 
 ## 1. ソースを取得する
 
-[ReleaseのソースZIP](https://github.com/Corvelis/sbv2-coreml/releases/tag/v0.1.0-dev5)をダウンロードして展開します。
+[GitHub](https://github.com/Corvelis/sbv2-coreml)の **Code → Download ZIP** でソースを取得して展開します。
 Gitを使う場合は次のコマンドでも取得できます。
 
 ```sh
-git clone --branch v0.1.0-dev5 https://github.com/Corvelis/sbv2-coreml.git
+git clone https://github.com/Corvelis/sbv2-coreml.git
 cd sbv2-coreml
 ```
 
@@ -38,21 +38,23 @@ SDKを自分のアプリへ組み込む場合は[SDK導入ガイド](sdk-guide.j
 
 | モデル | 内容 | 配布ファイルの容量 |
 |---|---|---|
-| [共通モデル](https://huggingface.co/AILogDev/sbv2-coreml-common) | BERT・Open JTalk辞書 | 約503 MB |
+| [共通モデル・INT8版](https://huggingface.co/AILogDev/sbv2-coreml-common) | BERT・Open JTalk辞書 | 約503 MB |
 | [JVNV F1 JP-Extra](https://huggingface.co/AILogDev/sbv2-coreml-jvnv-f1-jp) | 声モデル | 約294 MB |
 
+この手順では容量を抑えたINT8版を取得します。元のFP32版（共通モデル約1.52 GB）を使う場合は、
+[INT8版とFP32版の選び方・取得URL](model-selection.ja.md)を参照してください。声モデルは両方で共通です。
 ダウンロードと初回コンパイルには、上記の容量に加えて空き容量が必要です。
 
 1. アプリ右上のスライダーアイコンから **モデル設定** を開く。
 2. **URLからモデルを取得** を開き、**取得するモデル → 共通モデル** を選ぶ。
-3. 次の共通モデルURLを貼り付け、**ダウンロード** を押して完了まで待つ。
-4. **取得するモデル → 声モデル** に切り替え、声モデルURLで同じ操作を行う。
+3. **共通モデルの版 → INT8（約503 MB）** を選ぶ。取得URLが自動設定されるので、**ダウンロード** を押して完了まで待つ。
+4. **取得するモデル → 声モデル** に切り替える。JVNVの取得URLが自動設定されるので、**ダウンロード** を押す。
 5. 両方を取得したら **完了** でメイン画面へ戻る。
 
-**共通モデルURL**
+**共通モデルURL（INT8版）**
 
 ```text
-https://huggingface.co/AILogDev/sbv2-coreml-common/resolve/d9cc585298e2d59fb1df384fb62a1e15d73f8add/download.json
+https://huggingface.co/AILogDev/sbv2-coreml-common/resolve/973d6e239af305f0d78a8bf30c6af5093c0fd47d/int8/download.json
 ```
 
 **声モデルURL**
@@ -61,7 +63,8 @@ https://huggingface.co/AILogDev/sbv2-coreml-common/resolve/d9cc585298e2d59fb1df3
 https://huggingface.co/AILogDev/sbv2-coreml-jvnv-f1-jp/resolve/17faac326f120b171170f10807bb26b0da8257d9/download.json
 ```
 
-この欄には`download.json`のURLを入力します。リポジトリのWebページや圧縮アーカイブのURLは使えません。
+INT8／FP32の選択で上記の共通モデルURLが自動設定されます。別の配布元を指定する場合は、
+**共通モデルの版 → カスタムURL**でHTTPSの`download.json` URLを入力します。Webページや圧縮アーカイブのURLは使えません。
 取得後の音声合成はオフラインで動作します。
 
 ### Macでダウンロードしてフォルダを選ぶ場合
@@ -70,20 +73,20 @@ https://huggingface.co/AILogDev/sbv2-coreml-jvnv-f1-jp/resolve/17faac326f120b171
 
 ```sh
 hf download AILogDev/sbv2-coreml-common \
-  --revision d9cc585298e2d59fb1df384fb62a1e15d73f8add \
-  --local-dir models/sbv2-coreml-common
+  --revision 973d6e239af305f0d78a8bf30c6af5093c0fd47d \
+  --include "int8/*" --local-dir models
 hf download AILogDev/sbv2-coreml-jvnv-f1-jp \
   --revision 17faac326f120b171170f10807bb26b0da8257d9 \
   --local-dir models/sbv2-coreml-jvnv-f1-jp
 ```
 
 取得後、アプリの **モデル設定** で **共通モデル** と **声モデル** のフォルダを選びます。
-共通モデルを選ぶとBERTと辞書を自動認識します。
+共通モデルは`models/int8/`を選ぶと、BERTと辞書を自動認識します。
 iPhoneへ移す場合は、Finderのファイル共有でサンプルアプリへ2フォルダを丸ごとコピーするか、Filesから選べる場所へ置きます。
 
 ```text
 models/
-  sbv2-coreml-common/
+  int8/
     bert/vocab.txt
     bert/coreml_blocks/
     dictionary/sys.dic
@@ -107,22 +110,26 @@ iCloud等を使う場合も、中身がすべて端末へダウンロードさ�
 [サンプルアプリの使い方](sample-app.ja.md)
 
 初回はCore MLのコンパイル・モデルの読み込み・ウォームアップに時間がかかります。
+INT8版は読み込み後の最初のBERT実行にも時間がかかるため、**モデルを準備**の完了を待ってください。
+準備時間と合成速度の比較は[モデルの選び方](model-selection.ja.md)にあります。
 コンパイルキャッシュを残すと、次回の準備時間を短縮できます。
 入力の長さが変わると、初回推論の準備が追加で発生する場合があります。
 
 再起動後、モデルを選び直す必要がある場合は、**モデル設定**から取得済みフォルダを指定してください。
-サンプルのDocuments直下に`sbv2-coreml-common`と`sbv2-coreml-jvnv-f1-jp`を置いた場合は自動検出します。
+上の例の`int8/`は、共通モデルとして自分で選択します。自動検出を使う場合は、フォルダ名を`sbv2-coreml-common`へ変更し、
+Documents直下に`sbv2-coreml-jvnv-f1-jp`と一緒に置いてください。
 iPhoneでは **ファイル → このiPhone内 → SBV2 Core ML** から保存済みフォルダを確認できます。
 
 ## MacのターミナルからWAVを作る
 
 モデルを上記の`models/`へ取得した後、リポジトリのルートで実行します。
+FP32版の場合は、下の`int8`を`float32`へ置き換えます。
 
 ```sh
 swift run -c release sbv2-say \
-  models/sbv2-coreml-common/bert \
+  models/int8/bert \
   models/sbv2-coreml-jvnv-f1-jp \
-  models/sbv2-coreml-common/dictionary \
+  models/int8/dictionary \
   output.wav "こんにちは。今日はいい天気ですね。"
 afplay output.wav
 ```

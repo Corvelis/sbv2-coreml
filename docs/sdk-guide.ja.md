@@ -24,6 +24,8 @@ SDK、共通モデル、声モデルは別の配布物です。Swift Packageを�
 モデルをアプリの書き込み可能なDocumentsまたはApplication Supportへ配置します。
 `ModelPaths`には**ローカルのフォルダURL**を渡します。HTTPS URLや個々の`.mlpackage`を直接渡しません。
 共通フォルダの`bert/`と`dictionary/`、声フォルダのルートをそれぞれ指定します。
+INT8版と元のFP32版は同じAPIで使え、共通フォルダのURLで選択します。声フォルダは共有できます。
+[両方の取得先と切り替え手順](model-selection.ja.md)
 
 現在のBERT実装は`.mlpackage`と同じ階層に`.mlmodelc`キャッシュを保存するため、そこへの書き込み権限が必要です。
 アプリの読み取り専用Bundleに同梱した場合は、初回に書き込み可能な領域へコピーしてから読み込んでください。

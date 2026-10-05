@@ -14,7 +14,7 @@ Inference runs on-device through Core ML. Python and ONNX Runtime are not requir
   and the [JVNV voice](https://huggingface.co/AILogDev/sbv2-coreml-jvnv-f1-jp).
   Model weights are downloaded separately from the source/SDK.
 
-[Source downloads](https://github.com/Corvelis/sbv2-coreml/releases/tag/v0.1.0-dev5) ·
+[Source downloads](https://github.com/Corvelis/sbv2-coreml) ·
 [Quick Start](docs/getting-started.ja.md) · [SDK guide](docs/sdk-guide.ja.md) ·
 [Sample app](docs/sample-app.ja.md) · [API reference](docs/api-reference.ja.md) ·
 [Troubleshooting](docs/troubleshooting.ja.md)
@@ -53,19 +53,21 @@ replay and cancellation. See the [SDK guide](docs/sdk-guide.ja.md).
 
 Open `Examples/Apple/SBV2Demo.xcodeproj` in Xcode. Select `SBV2Demo-iOS` or
 `SBV2Demo-macOS`; for iPhone, set your signing team and a unique bundle identifier.
-Choose the shared and voice folders in **モデル設定**, press **モデルを準備**,
+In **モデル設定 → URLからモデルを取得**, select INT8/FP32 under **共通モデルの版** to fill the manifest URL automatically.
+Download your shared model and voice, or choose existing folders. Press **モデルを準備**,
 then enter Japanese text and press **生成して再生**.
 The app generates the complete utterance before playing it.
 
 ## Create a WAV on Mac
 
-Download both model repositories into `models/`, then run from the source root:
+Download one shared variant and a voice into `models/` as shown in the [model selection guide](docs/model-selection.md).
+The example uses INT8; replace `int8` with `float32` for FP32, then run from the source root:
 
 ```sh
 swift run -c release sbv2-say \
-  models/sbv2-coreml-common/bert \
+  models/int8/bert \
   models/sbv2-coreml-jvnv-f1-jp \
-  models/sbv2-coreml-common/dictionary \
+  models/int8/dictionary \
   output.wav "こんにちは。今日はいい天気ですね。"
 afplay output.wav
 ```
@@ -88,13 +90,21 @@ Compatible voices reuse the shared BERT/dictionary.
 ONNX/AIVMX-only inputs, standard SBV2 and multilingual profiles are not supported.
 [Conversion guide](docs/conversion.md) · [Model format](docs/model-format.md)
 
-## Reduce the shared model size
+## Choose INT8 or original FP32
 
-`compress-common` stores shared BERT weights in 8bit or FP16. Your voice model stays separate.
-The default shared model uses 8bit storage: approximately 797 MB including JVNV, versus 1.81 GB with FP32 BERT, a 56% reduction.
-The first BERT prediction takes longer; call `load` and `warmUp` during preparation.
-Check audio quality and speed with your voices, texts and devices before adoption.
-[Compression guide](docs/compression.md)
+Both variants work with the same SDK and separate voice models.
+
+| Variant | Shared BERT/dictionary | With JVNV | Choose when |
+|---|---:|---:|---|
+| INT8 (`int8/`) | About 503 MB | About 797 MB | Storage size matters |
+| Original FP32 (`float32/`) | About 1.52 GB | About 1.81 GB | Avoiding weight quantization or shorter preparation matters |
+
+INT8 changes BERT weight storage; BERT computation and tensor interfaces remain FP32.
+Voice weights are unchanged, but BERT feature differences can affect prosody and audio duration.
+INT8 takes longer to prepare and is not necessarily faster to synthesize.
+[Download both variants, switch models and compare performance](docs/model-selection.md)
+
+The converter also includes `compress-common` for creating your own compressed shared model. [Compression guide](docs/compression.md)
 
 ## Licenses
 
