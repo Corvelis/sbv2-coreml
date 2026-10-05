@@ -36,7 +36,7 @@ SDK・ソースZIPにモデルの重みは含まれていません。取得方�
 ## XcodeへSDKを追加する
 
 1. **File → Add Package Dependencies**で、次のURLを指定します。
-2. **Exact Version: 0.1.0-dev5**を選びます。
+2. **Exact Version: 0.2.0**を選びます。
 3. アプリのターゲットへ **SBV2CoreML** を追加します。
 
 ```text

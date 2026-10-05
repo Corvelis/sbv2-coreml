@@ -1,2 +1,2 @@
 """Style-Bert-VITS2 JP-Extra to Core ML distribution tools."""
-__version__ = "0.1.0.dev5"
+__version__ = "0.2.0"
