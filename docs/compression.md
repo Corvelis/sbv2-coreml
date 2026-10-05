@@ -22,7 +22,7 @@ With the separate JVNV voice, totals are approximately 1.81 GB, 797 MB, and 1.11
 
 For three sentences with JVNV Neutral on iPhone 17 Pro, the warmed median RTF was 0.067 for FP32 and 0.071 for 8bit.
 Other voices, texts and devices can differ; these measurements did not run an LLM concurrently.
-The first BERT prediction takes longer with 8bit storage. Cached reload plus `warmUp` took approximately 6 seconds for FP32 and 18 seconds for 8bit in this comparison.
+The first BERT prediction takes longer with 8bit storage in SDK v0.2.0. Cached reload plus `warmUp` took approximately 6 seconds for FP32 and 18 seconds for 8bit in this comparison.
 Initial compilation is an additional cost. Retain a prepared synthesizer for repeated use.
 
 ## Compress the original model

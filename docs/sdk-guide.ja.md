@@ -34,7 +34,9 @@ Files/Finderのピッカーから外部フォルダを受け取った場合は�
 外部フォルダをそのまま使う場合は、モデル使用中のアクセス権を保持し、使用後に対応する解放処理を行います。
 URLのパス文字列を保存するだけでは外部フォルダへの権限は復元できません。[Appleの説明](https://developer.apple.com/documentation/foundation/nsurl/)
 
-付属サンプルではDocuments直下の`sbv2-coreml-common`と`sbv2-coreml-jvnv-f1-jp`を自動検出します。
+付属サンプルではDocuments直下の共通フォルダ`sbv2-coreml-common`、`sbv2-coreml-common-int8`、
+`sbv2-coreml-common-float32`をこの順で探し、最初に見つかったBERT・辞書の組を選びます。
+サンプル声は`sbv2-coreml-jvnv-f1-jp`から自動検出します。
 自分のiPhoneアプリでDocumentsをFiles／Finderの共有対象にする場合は、用途に合わせて
 `UIFileSharingEnabled`と`LSSupportsOpeningDocumentsInPlace`を設定してください。
 [Appleのファイル共有の説明](https://developer.apple.com/documentation/bundleresources/information-property-list/uifilesharingenabled)

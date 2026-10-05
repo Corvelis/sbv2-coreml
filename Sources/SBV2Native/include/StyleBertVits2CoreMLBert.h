@@ -7,6 +7,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (void * _Nullable)createSessionWithBertPath:(NSString *)bertPath NS_SWIFT_NAME(createSession(withBertPath:));
 
+/// Load both BERT blocks while independent model preparation runs on the caller's thread.
+/// Returns only after both preparations finish, so the session can then be used or released.
++ (BOOL)prepareSession:(void *)session
+        concurrentWork:(void (NS_NOESCAPE ^)(void))concurrentWork NS_SWIFT_NAME(prepareSession(_:concurrentWork:));
+
 + (NSData *)runBertInferenceDataWithSession:(void *)session
                                tokenIdsData:(NSData *)tokenIdsData
                           attentionMaskData:(NSData *)attentionMaskData NS_SWIFT_NAME(runBertInferenceData(withSession:tokenIdsData:attentionMaskData:));

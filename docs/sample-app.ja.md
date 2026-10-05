@@ -18,7 +18,8 @@ Xcodeでの起動とモデルファイルの配置は[クイックスタート](
 5. **生成して再生** を押す。状態が「音声を生成しています。」→「再生中」→「再生完了」と変わる。
 
 共通フォルダを選ぶとBERTと辞書を自動認識します。個々の `.mlpackage` を選ぶ操作ではありません。
-共通フォルダを`sbv2-coreml-common`という名前にし、声の`sbv2-coreml-jvnv-f1-jp`とDocuments直下に置いた場合は、起動時に自動検出します。
+Documents直下の`sbv2-coreml-common`、`sbv2-coreml-common-int8`、`sbv2-coreml-common-float32`をこの順で探し、最初に見つかったBERT・辞書の組を起動時に自動検出します。
+声はDocuments直下の`sbv2-coreml-jvnv-f1-jp`から自動検出します。複数の共通モデルがある場合は、モデル設定から使いたいフォルダを選択できます。
 iPhoneでは「ファイル」アプリの **このiPhone内 → SBV2 Core ML** からもDocumentsを開けます。
 
 ## メイン画面の操作

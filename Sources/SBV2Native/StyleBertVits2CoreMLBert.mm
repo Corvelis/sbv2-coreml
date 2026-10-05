@@ -747,6 +747,35 @@ static NSData *runBertCoreMLBlockTwoFloatInputsAndMaskData(BertCoreMLBlock *bloc
 
 @implementation StyleBertVits2CoreMLBert
 
++ (BOOL)prepareSession:(void *)session concurrentWork:(void (^)(void))concurrentWork {
+    g_last_error.clear();
+    if (session == nullptr) {
+        g_last_error = "Core ML BERT preparation requires a session";
+        return NO;
+    }
+    auto *bertSession = static_cast<StyleBertVits2Session *>(session);
+    __block BOOL prepared = NO;
+    dispatch_group_t group = dispatch_group_create();
+    dispatch_group_async(group, dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
+        @autoreleasepool {
+            prepared = YES;
+            for (auto &block : bertSession->bertCoreMLBlocks) {
+                if (block.modelHandle != nullptr) continue;
+                NSString *path = [NSString stringWithUTF8String:block.packagePath.c_str()];
+                if (!createCoreMLModelForPackage(path, MLComputeUnitsAll, &block.modelHandle,
+                                                "Prepare BERT Core ML block")) {
+                    prepared = NO;
+                    break;
+                }
+            }
+        }
+    });
+    concurrentWork();
+    // A failed voice load must also wait before releasing the BERT session.
+    dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
+    return prepared;
+}
+
 + (void *)createSessionWithBertPath:(NSString *)bertPath {
     g_last_error.clear();
     auto session = std::make_unique<StyleBertVits2Session>();

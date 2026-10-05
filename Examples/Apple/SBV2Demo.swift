@@ -119,11 +119,19 @@ import SBV2CoreML
             let path = documents.appendingPathComponent(name)
             if FileManager.default.fileExists(atPath: path.path) { assets[kind] = path }
         }
-        for (kind, name) in [(Asset.bert, "sbv2-coreml-common/bert"),
-                             (.dictionary, "sbv2-coreml-common/dictionary"), (.voice, "sbv2-coreml-jvnv-f1-jp")] {
-            let path = documents.appendingPathComponent(name)
-            if FileManager.default.fileExists(atPath: path.path) { assets[kind] = path }
+        for name in ["sbv2-coreml-common", "sbv2-coreml-common-int8", "sbv2-coreml-common-float32"] {
+            let root = documents.appendingPathComponent(name)
+            let bert = root.appendingPathComponent("bert")
+            let dictionary = root.appendingPathComponent("dictionary")
+            if FileManager.default.fileExists(atPath: bert.path),
+               FileManager.default.fileExists(atPath: dictionary.path) {
+                assets[.bert] = bert
+                assets[.dictionary] = dictionary
+                break
+            }
         }
+        let voice = documents.appendingPathComponent("sbv2-coreml-jvnv-f1-jp")
+        if FileManager.default.fileExists(atPath: voice.path) { assets[.voice] = voice }
         if ProcessInfo.processInfo.arguments.contains("--sample-check") {
             Task { await sampleCheck() }
         } else if ProcessInfo.processInfo.arguments.contains("--smoke-test") {

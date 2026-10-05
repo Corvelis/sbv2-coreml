@@ -19,7 +19,7 @@ Both work with the same SDK and separate compatible voice models. Voices do not 
 | Example warmed median RTF | 0.071 | 0.067 |
 
 Sizes describe distribution files, excluding compilation caches and temporary downloads. Storage savings do not establish RAM savings.
-Timings were measured on iPhone 17 Pro with JVNV Neutral. Preparation had existing compilation caches;
+Timings were measured with SDK v0.2.0 on iPhone 17 Pro with JVNV Neutral. Preparation had existing compilation caches;
 RTF was measured for three sentences synthesized as one utterance, excluding loading and playback. No LLM ran concurrently.
 Other texts, voices and devices can differ. INT8 is not necessarily faster.
 

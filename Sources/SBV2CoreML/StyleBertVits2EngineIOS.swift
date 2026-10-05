@@ -101,11 +101,19 @@ final class StyleBertVits2EngineIOS {
             lastError = StyleBertVits2CoreMLBert.lastError()
             return false
         }
-        do {
-            try voice.prepareFlowModels()
-        } catch {
+        var voicePreparationError: Error?
+        let bertPrepared = StyleBertVits2CoreMLBert.prepareSession(handle) {
+            do { try voice.prepareFlowModels() }
+            catch { voicePreparationError = error }
+        }
+        if let error = voicePreparationError {
             StyleBertVits2CoreMLBert.releaseSession(handle)
             lastError = "Failed to load Core ML voice models: \(error)"
+            return false
+        }
+        guard bertPrepared else {
+            lastError = StyleBertVits2CoreMLBert.lastError()
+            StyleBertVits2CoreMLBert.releaseSession(handle)
             return false
         }
         sessionHandle = handle
