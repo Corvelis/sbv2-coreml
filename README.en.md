@@ -22,7 +22,7 @@ Inference runs on-device through Core ML. Python and ONNX Runtime are not requir
 ## Add the SDK
 
 In Xcode, select **File → Add Package Dependencies**, enter
-`https://github.com/Corvelis/sbv2-coreml.git`, choose **Exact Version: 0.1.0-dev5**,
+`https://github.com/Corvelis/sbv2-coreml.git`, choose **Exact Version: 0.2.0**,
 and add the **SBV2CoreML** product to your app.
 
 ```swift
