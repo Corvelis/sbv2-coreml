@@ -19,6 +19,9 @@ voice/
   coreml_voice/voice_shared.mlpackage/
 ```
 
+The layout above is INT8. Original FP32 uses `prefix.0_enum.mlpackage` and `group.1-23-conv_enum.mlpackage`.
+The SDK reads package paths from each variant's BERT manifest. See [model selection](model-selection.md) for downloads and switching.
+
 Voice functions: `pre_64`, `pre_128`, `sdp_64`, `sdp_128`, `flow_64`, `flow_128`,
 `flow_256`, `flow_512`, `decoder_combined_flex`, `decoder_combined_len_256_fp16`,
 `decoder_combined_len_32_fp16`. No ONNX file is needed in either folder.

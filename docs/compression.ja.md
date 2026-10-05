@@ -7,11 +7,14 @@
 macOSと、変換ツールの`convert`依存パッケージが必要です。
 インストール方法は[声モデルの変換](conversion.ja.md)を参照してください。
 
-通常配布の共通モデルは8bit圧縮済みです。自分で圧縮し直す場合は、元のFP32版を取得します。
+配布済みINT8版と元のFP32版を選んで使うだけなら変換は不要です。
+[共通モデルの選び方・取得先・切り替え手順](model-selection.ja.md)を参照してください。
+自分で圧縮し直す場合は、元のFP32版を取得します。
 
 ```sh
-hf download AILogDev/sbv2-coreml-common --revision fp32-v1 \
-  --local-dir ./sbv2-coreml-common-fp32
+hf download AILogDev/sbv2-coreml-common \
+  --revision 973d6e239af305f0d78a8bf30c6af5093c0fd47d \
+  --include "float32/*" --local-dir models
 ```
 
 ## 容量・速度の目安
@@ -34,21 +37,23 @@ iPhone 17 Pro・JVNV Neutralの3文合成では、準備後のRTF中央値がFP3
 
 ```sh
 .venv/bin/sbv2-coreml compress-common \
-  --input ./sbv2-coreml-common-fp32 \
-  --output ./sbv2-coreml-common-int8 \
+  --input models/float32 \
+  --output models/my-common-int8 \
   --mode int8
-.venv/bin/sbv2-coreml verify ./sbv2-coreml-common-int8
+.venv/bin/sbv2-coreml verify models/my-common-int8
 ```
 
 32要素のブロックごとに重みを8bitで保存します。演算と入出力の精度はFP32を維持します。
 既存の出力フォルダには上書きできません。入力には元の非圧縮共通モデルを指定してください。
 
-## より小さい数値差を優先する
+## FP16保存版を自分で作る（任意）
+
+FP16保存版の変換済みモデルは配布していません。`compress-common`で生成できます。
 
 ```sh
 .venv/bin/sbv2-coreml compress-common \
-  --input ./sbv2-coreml-common-fp32 \
-  --output ./sbv2-coreml-common-fp16 \
+  --input models/float32 \
+  --output models/my-common-fp16 \
   --mode fp16-weights
 ```
 
@@ -57,7 +62,7 @@ iPhone 17 Pro・JVNV Neutralの3文合成では、準備後のRTF中央値がFP3
 
 ## SDK・サンプルアプリで使う
 
-サンプルアプリの「モデル設定」で、生成した共通モデルフォルダをBERTとして選びます。
+サンプルアプリの「モデル設定 → 共通モデル」で、生成した共通モデルの親フォルダを選びます。
 辞書も自動設定されます。声モデルの設定は同じものを使用できます。
 SDKでは`ModelPaths.bert`と`ModelPaths.dictionary`に新しい共通モデルのサブフォルダを指定します。
 

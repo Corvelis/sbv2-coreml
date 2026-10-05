@@ -203,7 +203,7 @@ def compress_common(args):
 Style-Bert-VITS2 JP-Extra SDK用の共通BERT・日本語辞書です。
 BERTの重みを{mode_label}で保存し、計算はFP32を維持します。声モデルは別途用意してください。
 
-サンプルアプリの「モデル設定」で、このフォルダをBERTとして選択すると辞書も設定されます。
+サンプルアプリの「モデル設定 → 共通モデル」で、この親フォルダを選択するとBERTと辞書が設定されます。
 SDKには`bert`、`dictionary`と、別の声モデルフォルダを渡します。
 
 圧縮前とは数値が変わります。採用前に、使う声・文章・端末で音質と速度を確認してください。
@@ -217,7 +217,7 @@ SDKには`bert`、`dictionary`と、別の声モデルフォルダを渡しま�
 Shared BERT and Japanese dictionary for the Style-Bert-VITS2 JP-Extra SDK.
 BERT weights use {mode_label}; computation remains FP32. Supply a separate voice model.
 
-Select this folder as BERT in the sample app's model settings. The dictionary is detected automatically.
+Select this root folder in the sample app's 「モデル設定 → 共通モデル」. BERT and the dictionary are detected automatically.
 For the SDK, pass the `bert` and `dictionary` subfolders alongside your voice folder.
 
 Compression changes numerical results. Check audio quality and speed with your voices, texts and devices before adoption.

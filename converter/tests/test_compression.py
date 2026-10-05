@@ -10,6 +10,13 @@ from sbv2_coreml.cli import compress_common, verify
 
 
 class CompressionBundleTests(unittest.TestCase):
+    def setUp(self):
+        # These tests mock the Core ML worker and exercise portable packaging.
+        # Actual model conversion is tested separately on macOS.
+        platform = patch('sbv2_coreml.cli.platform.system', return_value='Darwin')
+        platform.start()
+        self.addCleanup(platform.stop)
+
     def source(self, root):
         source = root / 'common'; source.mkdir()
         (source / 'bert').mkdir(); (source / 'dictionary').mkdir()
